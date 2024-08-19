@@ -8,5 +8,5 @@ On startup, you will be required to enter your username. Hence you follow the gu
 3.  You must start with the Shoot command and write the x and y coordinates on a new row to navigate your crosshair where you want to shoot
 >[!NOTE]
 >coordinates begin from {0:0} and should not exceed map size
-4.  you can either continue shooting or update your stats with the UpdateStats command
+4.  You can either continue shooting or update your stats with the UpdateStats command
 5.  When you are finished you call the command Report which will end your game, save your user data, and depict your stats on the console screen.
