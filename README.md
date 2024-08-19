@@ -1,4 +1,4 @@
-# Shooting-Game-Project
+# Shooter-Game-Project
 # Overview
  It is a personally developed idea of a console game that initializes a 2-dimensional array as a terrain with possible enemies to shoot. It has been created via OOP principles that allow easy manageability and control over game objects and entities. Additionally, it is connected to a database storage system for user data preservation for future app developments (Leaderboards, Statistics, etc...). To achieve better decoupling of enemies' properties and abilities, Shooter Game has implemented repository and factory patterns.
 # How to play
