@@ -1,11 +1,11 @@
 # Shooting-Game-Project
-# Documentation
- It is a personally developed idea of a console game that initializes terrain of invisible spaces with possible enemies to shoot. It has been created via OOP principles that allow easy manageability and control over game objects and entities. Additionally, it is connected to a database storage system for user data preservation for future app developments (Leaderboards, Statistics, etc...). To achieve better decoupling of enemies' properties and abilities, Shooter Game has implemented repository and factory patterns.
+# Overview
+ It is a personally developed idea of a console game that initializes a 2-dimensional array as a terrain with possible enemies to shoot. It has been created via OOP principles that allow easy manageability and control over game objects and entities. Additionally, it is connected to a database storage system for user data preservation for future app developments (Leaderboards, Statistics, etc...). To achieve better decoupling of enemies' properties and abilities, Shooter Game has implemented repository and factory patterns.
 # How to play
 On startup, you will be required to enter your username. Hence you follow the guidelines:
 1.  You will be warped in a randomly generated map. It could be DefaultMap(5:5) size or CustomMap(x,y) size:
-2.  You will be listed several commands available in our game: **Shoot/Hint/UpdateStats/Report**
-3.  You must start with the Shoot command and write the x and y coordinates where you want to shoot
+2.  You will be listed several commands available in our game: **Shoot/StatsUpdate/Report/Hint**
+3.  You must start with the Shoot command and write the x and y coordinates on a new row to navigate your crosshair where you want to shoot
 >[!NOTE]
 >coordinates begin from {0:0} and should not exceed map size
 4.  you can either continue shooting or update your stats with the UpdateStats command
