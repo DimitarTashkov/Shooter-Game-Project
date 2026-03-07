@@ -5,7 +5,7 @@ using Shooter_Game0._1.Utilities.Randomizer;
 
 namespace Shooter_Game0._1.Forms
 {
-    public class GameForm : Form
+    public partial class GameForm : Form
     {
         private const int CellSize = 64;
 
@@ -17,12 +17,6 @@ namespace Shooter_Game0._1.Forms
         private int cursorRow;
         private int cursorCol;
 
-        private Panel mapPanel = null!;
-        private ListBox combatLog = null!;
-        private Label statsLabel = null!;
-        private Label enemiesLeftLabel = null!;
-        private Label weaponLabel = null!;
-
         public GameForm(string username, string weaponType)
         {
             this.username = username;
@@ -32,10 +26,11 @@ namespace Shooter_Game0._1.Forms
             controller.SetWeaponType(weaponType);
 
             map = Randomizer.MapRandomizer();
+
+            InitializeComponent();
+            ApplyDynamicLayout();
+
             int enemiesCount = map.X + map.Y;
-
-            InitializeComponents();
-
             string result = controller.GenerateEnemies(map, enemiesCount);
 
             LogMessage($"Welcome, {username}!");
@@ -47,7 +42,7 @@ namespace Shooter_Game0._1.Forms
             UpdateEnemiesLeft();
         }
 
-        private void InitializeComponents()
+        private void ApplyDynamicLayout()
         {
             int mapPixelW = map.Y * CellSize;
             int mapPixelH = map.X * CellSize;
@@ -56,97 +51,18 @@ namespace Shooter_Game0._1.Forms
 
             Text = $"Shooter Game — {username}";
             ClientSize = new Size(mapPixelW + logWidth + 30, Math.Max(mapPixelH, 300) + bottomBar + 20);
-            StartPosition = FormStartPosition.CenterScreen;
-            BackColor = Color.FromArgb(25, 25, 35);
-            KeyPreview = true;
-            DoubleBuffered = true;
 
-            // ── Map panel ──
-            mapPanel = new Panel
-            {
-                Location = new Point(10, 10),
-                Size = new Size(mapPixelW, mapPixelH),
-                BackColor = Color.FromArgb(40, 40, 50),
-                BorderStyle = BorderStyle.FixedSingle
-            };
-            mapPanel.Paint += MapPanel_Paint;
-            mapPanel.MouseClick += MapPanel_MouseClick;
-
-            // ── Combat log ──
-            combatLog = new ListBox
-            {
-                Location = new Point(mapPixelW + 20, 10),
-                Size = new Size(logWidth, mapPixelH - 90),
-                BackColor = Color.FromArgb(20, 20, 30),
-                ForeColor = Color.LightGreen,
-                Font = new Font("Consolas", 9),
-                BorderStyle = BorderStyle.FixedSingle,
-                SelectionMode = SelectionMode.None,
-                HorizontalScrollbar = true
-            };
-
-            // ── Stats labels ──
-            statsLabel = new Label
-            {
-                Location = new Point(mapPixelW + 20, mapPixelH - 70),
-                Size = new Size(logWidth, 40),
-                ForeColor = Color.White,
-                Font = new Font("Segoe UI", 9),
-                Text = "Kills: 0 | Damage: 0 | Points: 0"
-            };
-
-            enemiesLeftLabel = new Label
-            {
-                Location = new Point(mapPixelW + 20, mapPixelH - 30),
-                Size = new Size(logWidth, 25),
-                ForeColor = Color.Yellow,
-                Font = new Font("Segoe UI", 10, FontStyle.Bold)
-            };
-
-            // ── Bottom bar ──
-            weaponLabel = new Label
-            {
-                Location = new Point(10, mapPixelH + 20),
-                AutoSize = true,
-                ForeColor = Color.Cyan,
-                Font = new Font("Segoe UI", 11, FontStyle.Bold),
-                Text = $"Weapon: {weaponType}"
-            };
-
-            var hintButton = new Button
-            {
-                Text = "HINT (H)",
-                Location = new Point(mapPixelW - 230, mapPixelH + 15),
-                Size = new Size(105, 35),
-                FlatStyle = FlatStyle.Flat,
-                BackColor = Color.FromArgb(80, 80, 20),
-                ForeColor = Color.White,
-                Font = new Font("Segoe UI", 9, FontStyle.Bold),
-                Cursor = Cursors.Hand
-            };
-            hintButton.FlatAppearance.BorderSize = 0;
-            hintButton.Click += (s, e) => ShowHint();
-
-            var endButton = new Button
-            {
-                Text = "END GAME",
-                Location = new Point(mapPixelW - 115, mapPixelH + 15),
-                Size = new Size(105, 35),
-                FlatStyle = FlatStyle.Flat,
-                BackColor = Color.FromArgb(180, 40, 40),
-                ForeColor = Color.White,
-                Font = new Font("Segoe UI", 9, FontStyle.Bold),
-                Cursor = Cursors.Hand
-            };
-            endButton.FlatAppearance.BorderSize = 0;
-            endButton.Click += (s, e) => EndGame();
-
-            Controls.AddRange([
-                mapPanel, combatLog, statsLabel, enemiesLeftLabel,
-                weaponLabel, hintButton, endButton
-            ]);
-
-            KeyDown += GameForm_KeyDown;
+            mapPanel.Size = new Size(mapPixelW, mapPixelH);
+            combatLog.Location = new Point(mapPixelW + 20, 10);
+            combatLog.Size = new Size(logWidth, mapPixelH - 90);
+            statsLabel.Location = new Point(mapPixelW + 20, mapPixelH - 70);
+            statsLabel.Size = new Size(logWidth, 40);
+            enemiesLeftLabel.Location = new Point(mapPixelW + 20, mapPixelH - 30);
+            enemiesLeftLabel.Size = new Size(logWidth, 25);
+            weaponLabel.Location = new Point(10, mapPixelH + 20);
+            weaponLabel.Text = $"Weapon: {weaponType}";
+            hintButton.Location = new Point(mapPixelW - 230, mapPixelH + 15);
+            endButton.Location = new Point(mapPixelW - 115, mapPixelH + 15);
         }
 
         // ═══════════════════════════════════════════
@@ -209,7 +125,6 @@ namespace Shooter_Game0._1.Forms
             Graphics g = e.Graphics;
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
-            // Draw grid cells
             using var cellBrush = new SolidBrush(Color.FromArgb(50, 50, 60));
             using var gridPen = new Pen(Color.FromArgb(70, 70, 80));
             using var coordFont = new Font("Consolas", 7);
@@ -227,7 +142,6 @@ namespace Shooter_Game0._1.Forms
                 }
             }
 
-            // Draw enemies
             using var enemyFont = new Font("Segoe UI", 14, FontStyle.Bold);
             foreach (var kvp in controller.EnemiesCoordinates)
             {
@@ -253,7 +167,6 @@ namespace Shooter_Game0._1.Forms
                 }
             }
 
-            // Draw player cursor / crosshair
             int cx = cursorCol * CellSize;
             int cy = cursorRow * CellSize;
             using var cursorPen = new Pen(Color.FromArgb(0, 180, 255), 3);
@@ -350,5 +263,8 @@ namespace Shooter_Game0._1.Forms
             "Wizard" => Color.FromArgb(148, 103, 189),
             _ => Color.Yellow
         };
+
+        private void HintButton_Click(object? sender, EventArgs e) => ShowHint();
+        private void EndButton_Click(object? sender, EventArgs e) => EndGame();
     }
 }
