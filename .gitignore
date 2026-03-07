@@ -1,0 +1,22 @@
+﻿## Visual Studio cache/options directory
+.vs/
+
+## Build output
+bin/
+obj/
+
+## NuGet packages
+*.nupkg
+packages/
+project.lock.json
+artifacts/
+
+## User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## OS
+Thumbs.db
+.DS_Store
