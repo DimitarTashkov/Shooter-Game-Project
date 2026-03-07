@@ -8,13 +8,7 @@ using Shooter_Game0._1.Repositories;
 using Shooter_Game0._1.Utilities.Hinter;
 using Shooter_Game0._1.Utilities.Messages;
 using Shooter_Game0._1.Utilities.Randomizer;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Runtime.Serialization;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Shooter_Game0._1.Core
 {
@@ -77,33 +71,30 @@ namespace Shooter_Game0._1.Core
         {
 
             sb.Clear();
-            string returnInfo = string.Empty;
 
+            IMap? map = maps.Models().FirstOrDefault();
+            if (map == null)
+            {
+                throw new InvalidOperationException(ExceptionMessages.MapHasNotBeenAdded);
+            }
 
-            Dictionary<int, int> aimCoordinates = new Dictionary<int, int>();
+            Dictionary<int, int> aimCoordinates = new();
             aimCoordinates.Add(xCoordinate, yCoordinate);
 
             IWeapon weapon = Randomizer.WeaponsRandomizer();
-            IMap map = maps.Models().FirstOrDefault();
-            IEnemy enemy = ReturnEnemyFromCoordinates(xCoordinate,yCoordinate,enemiesCoordinates.Enemiescoordinates);
+            IEnemy? enemy = ReturnEnemyFromCoordinates(xCoordinate, yCoordinate, enemiesCoordinates.Enemiescoordinates);
             weapons.AddNew(weapon);
 
             map.Terrain[oldXCoordinate, oldYCoordinate] = "-";
             oldXCoordinate = xCoordinate;
             oldYCoordinate = yCoordinate;
 
-            if (map == null)
-            {
-                throw new InvalidOperationException(string.Format(ExceptionMessages.MapHasNotBeenAdded, map.GetType().Name));
-            }      
-            
             if (enemy == null)
             {
                 writer.WriteLine(Environment.NewLine);
                 map.Terrain[xCoordinate, yCoordinate] = "+";
                 map.VisualizeMap(map.Terrain);
-                returnInfo = string.Format(OutputMessages.NoEnemyInThisLocation, xCoordinate, yCoordinate);
-                return returnInfo;
+                return string.Format(OutputMessages.NoEnemyInThisLocation, xCoordinate, yCoordinate);
             }
                 weapon.CalculateDamage();
                 double remain = weapon.Damage - enemy.Life;
@@ -134,12 +125,8 @@ namespace Shooter_Game0._1.Core
         public void StatsUpdate(string username)
         {
             sb.Clear();
-            IUser user = null;
-            if(users.Models().Any(u => u.Username == username))
-            {
-                 user = users.Models().FirstOrDefault(u => u.Username == username);
-            }
-            else
+            IUser? user = users.Models().FirstOrDefault(u => u.Username == username);
+            if (user == null)
             {
                 user = builder.CreateUser(username);
                 users.AddNew(user);
@@ -153,12 +140,9 @@ namespace Shooter_Game0._1.Core
         {
             writer.WriteLine(sb.ToString().Trim());
         }
-        private IEnemy ReturnEnemyFromCoordinates(int x,int y, Dictionary<Dictionary<int, int>, IEnemy> enemiesCoordinates)
+        private IEnemy? ReturnEnemyFromCoordinates(int x, int y, Dictionary<Dictionary<int, int>, IEnemy> enemiesCoordinates)
         {
-            Dictionary<int, int> aimCoordinates = new Dictionary<int, int>();
-            aimCoordinates.Add(x, y);
-
-            IEnemy enemy = null;
+            IEnemy? enemy = null;
             foreach (var kvp in enemiesCoordinates)
             {
                 Dictionary<int, int> coordinate = kvp.Key;
