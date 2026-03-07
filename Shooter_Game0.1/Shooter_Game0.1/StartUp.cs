@@ -1,19 +1,15 @@
-﻿using Shooter_Game0._1.Core;
-using Shooter_Game0._1.Core.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Shooter_Game0._1.Forms;
 
 namespace Shooter_Game0._1
 {
     public class StartUp 
     {
+        [STAThread]
         public static void Main(string[] args)
         {
-            IEngine engine = new Engine();
-            engine.Run();
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new MainMenuForm());
         }
     }
 }

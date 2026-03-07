@@ -20,6 +20,7 @@ namespace Shooter_Game0._1.Core
         private int oldXCoordinate;
         private int oldYCoordinate;
 
+        private string? selectedWeaponType;
         private EnemiesRepository enemies;
         private WeaponsRepository weapons;
         private MapsRepository maps;
@@ -40,6 +41,9 @@ namespace Shooter_Game0._1.Core
             enemiesCoordinates = new EnemiesCoordinatesRepository();
         }
         public Dictionary<Dictionary<int, int>, IEnemy> EnemiesCoordinates => enemiesCoordinates.Enemiescoordinates;
+        public IMap? CurrentMap => maps.Models().FirstOrDefault();
+        public void SetWeaponType(string weaponType) => selectedWeaponType = weaponType;
+        public string GetReport() => sb.ToString().Trim();
         public string GenerateEnemies(IMap map, int countOfEnemies)
         {
             map.GenerateTerrain();
@@ -81,7 +85,9 @@ namespace Shooter_Game0._1.Core
             Dictionary<int, int> aimCoordinates = new();
             aimCoordinates.Add(xCoordinate, yCoordinate);
 
-            IWeapon weapon = Randomizer.WeaponsRandomizer();
+            IWeapon weapon = selectedWeaponType != null
+                ? builder.CreateWeapon(selectedWeaponType)
+                : Randomizer.WeaponsRandomizer();
             IEnemy? enemy = ReturnEnemyFromCoordinates(xCoordinate, yCoordinate, enemiesCoordinates.Enemiescoordinates);
             weapons.AddNew(weapon);
 
