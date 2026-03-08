@@ -73,8 +73,7 @@ namespace Shooter_Game0._1.Forms
             enemiesLeftLabel.Size = new Size(logWidth, 25);
             weaponLabel.Location = new Point(10, mapPixelH + 20);
             weaponLabel.Text = $"Weapon: {weaponType}";
-            hintButton.Location = new Point(mapPixelW - 230, mapPixelH + 15);
-            endButton.Location = new Point(mapPixelW - 115, mapPixelH + 15);
+
 
             // Phase 4: Enable optimized double buffering for flicker-free rendering
             SetStyle(ControlStyles.OptimizedDoubleBuffer
@@ -256,7 +255,6 @@ namespace Shooter_Game0._1.Forms
             try
             {
                 using var context = new ShooterGameContext();
-                context.Database.EnsureCreated();
                 double score = controller.GetPlayerPoints(username);
                 context.SaveScore(username, score);
             }

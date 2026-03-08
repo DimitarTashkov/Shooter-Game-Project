@@ -54,16 +54,16 @@ namespace Shooter_Game0._1.Forms
             combatLog.Location = new Point(340, 10);
             combatLog.Name = "combatLog";
             combatLog.SelectionMode = SelectionMode.None;
-            combatLog.Size = new Size(360, 230);
+            combatLog.Size = new Size(360, 260);
             combatLog.TabIndex = 1;
             // 
             // statsLabel
             // 
             statsLabel.Font = new Font("Segoe UI", 9F);
             statsLabel.ForeColor = Color.White;
-            statsLabel.Location = new Point(340, 250);
+            statsLabel.Location = new Point(340, 278);
             statsLabel.Name = "statsLabel";
-            statsLabel.Size = new Size(360, 40);
+            statsLabel.Size = new Size(360, 22);
             statsLabel.TabIndex = 2;
             statsLabel.Text = "Kills: 0 | Damage: 0 | Points: 0";
             // 
@@ -71,9 +71,9 @@ namespace Shooter_Game0._1.Forms
             // 
             enemiesLeftLabel.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             enemiesLeftLabel.ForeColor = Color.Yellow;
-            enemiesLeftLabel.Location = new Point(340, 290);
+            enemiesLeftLabel.Location = new Point(340, 305);
             enemiesLeftLabel.Name = "enemiesLeftLabel";
-            enemiesLeftLabel.Size = new Size(360, 25);
+            enemiesLeftLabel.Size = new Size(360, 22);
             enemiesLeftLabel.TabIndex = 3;
             enemiesLeftLabel.Text = "Enemies remaining: 0";
             // 
@@ -82,7 +82,7 @@ namespace Shooter_Game0._1.Forms
             weaponLabel.AutoSize = true;
             weaponLabel.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
             weaponLabel.ForeColor = Color.Cyan;
-            weaponLabel.Location = new Point(10, 340);
+            weaponLabel.Location = new Point(12, 350);
             weaponLabel.Name = "weaponLabel";
             weaponLabel.Size = new Size(80, 20);
             weaponLabel.TabIndex = 4;
@@ -93,12 +93,13 @@ namespace Shooter_Game0._1.Forms
             hintButton.BackColor = Color.FromArgb(80, 80, 20);
             hintButton.Cursor = Cursors.Hand;
             hintButton.FlatAppearance.BorderSize = 0;
+            hintButton.FlatAppearance.MouseOverBackColor = Color.FromArgb(110, 110, 30);
             hintButton.FlatStyle = FlatStyle.Flat;
             hintButton.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             hintButton.ForeColor = Color.White;
-            hintButton.Location = new Point(90, 335);
+            hintButton.Location = new Point(340, 342);
             hintButton.Name = "hintButton";
-            hintButton.Size = new Size(105, 35);
+            hintButton.Size = new Size(175, 38);
             hintButton.TabIndex = 5;
             hintButton.Text = "HINT (H)";
             hintButton.UseVisualStyleBackColor = false;
@@ -109,12 +110,13 @@ namespace Shooter_Game0._1.Forms
             endButton.BackColor = Color.FromArgb(180, 40, 40);
             endButton.Cursor = Cursors.Hand;
             endButton.FlatAppearance.BorderSize = 0;
+            endButton.FlatAppearance.MouseOverBackColor = Color.FromArgb(210, 60, 60);
             endButton.FlatStyle = FlatStyle.Flat;
             endButton.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             endButton.ForeColor = Color.White;
-            endButton.Location = new Point(205, 335);
+            endButton.Location = new Point(525, 342);
             endButton.Name = "endButton";
-            endButton.Size = new Size(105, 35);
+            endButton.Size = new Size(175, 38);
             endButton.TabIndex = 6;
             endButton.Text = "END GAME";
             endButton.UseVisualStyleBackColor = false;
@@ -134,7 +136,9 @@ namespace Shooter_Game0._1.Forms
             Controls.Add(combatLog);
             Controls.Add(mapPanel);
             DoubleBuffered = true;
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             KeyPreview = true;
+            MaximizeBox = false;
             Name = "GameForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Shooter Game";

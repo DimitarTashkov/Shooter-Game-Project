@@ -30,35 +30,36 @@ namespace Shooter_Game0._1.Forms
             // 
             // titleLabel
             // 
-            titleLabel.AutoSize = true;
             titleLabel.Font = new Font("Segoe UI", 28F, FontStyle.Bold);
             titleLabel.ForeColor = Color.FromArgb(0, 180, 255);
-            titleLabel.Location = new Point(90, 40);
+            titleLabel.Location = new Point(10, 35);
             titleLabel.Name = "titleLabel";
-            titleLabel.Size = new Size(320, 51);
+            titleLabel.Size = new Size(464, 55);
             titleLabel.TabIndex = 0;
             titleLabel.Text = "SHOOTER GAME";
+            titleLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // subtitleLabel
             // 
-            subtitleLabel.AutoSize = true;
             subtitleLabel.Font = new Font("Segoe UI", 10F);
-            subtitleLabel.ForeColor = Color.Gray;
-            subtitleLabel.Location = new Point(140, 90);
+            subtitleLabel.ForeColor = Color.FromArgb(140, 140, 160);
+            subtitleLabel.Location = new Point(10, 95);
             subtitleLabel.Name = "subtitleLabel";
-            subtitleLabel.Size = new Size(198, 19);
+            subtitleLabel.Size = new Size(464, 22);
             subtitleLabel.TabIndex = 1;
             subtitleLabel.Text = "Console-to-WinForms Edition";
+            subtitleLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // startButton
             // 
             startButton.BackColor = Color.FromArgb(0, 120, 200);
             startButton.Cursor = Cursors.Hand;
             startButton.FlatAppearance.BorderSize = 0;
+            startButton.FlatAppearance.MouseOverBackColor = Color.FromArgb(0, 150, 240);
             startButton.FlatStyle = FlatStyle.Flat;
             startButton.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
             startButton.ForeColor = Color.White;
-            startButton.Location = new Point(140, 160);
+            startButton.Location = new Point(132, 150);
             startButton.Name = "startButton";
             startButton.Size = new Size(220, 50);
             startButton.TabIndex = 2;
@@ -68,13 +69,14 @@ namespace Shooter_Game0._1.Forms
             // 
             // leaderboardButton
             // 
-            leaderboardButton.BackColor = Color.FromArgb(80, 80, 20);
+            leaderboardButton.BackColor = Color.FromArgb(140, 110, 20);
             leaderboardButton.Cursor = Cursors.Hand;
             leaderboardButton.FlatAppearance.BorderSize = 0;
+            leaderboardButton.FlatAppearance.MouseOverBackColor = Color.FromArgb(170, 140, 30);
             leaderboardButton.FlatStyle = FlatStyle.Flat;
             leaderboardButton.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
             leaderboardButton.ForeColor = Color.White;
-            leaderboardButton.Location = new Point(140, 230);
+            leaderboardButton.Location = new Point(132, 220);
             leaderboardButton.Name = "leaderboardButton";
             leaderboardButton.Size = new Size(220, 50);
             leaderboardButton.TabIndex = 3;
@@ -87,10 +89,11 @@ namespace Shooter_Game0._1.Forms
             exitButton.BackColor = Color.FromArgb(180, 40, 40);
             exitButton.Cursor = Cursors.Hand;
             exitButton.FlatAppearance.BorderSize = 0;
+            exitButton.FlatAppearance.MouseOverBackColor = Color.FromArgb(210, 60, 60);
             exitButton.FlatStyle = FlatStyle.Flat;
             exitButton.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
             exitButton.ForeColor = Color.White;
-            exitButton.Location = new Point(140, 310);
+            exitButton.Location = new Point(132, 290);
             exitButton.Name = "exitButton";
             exitButton.Size = new Size(220, 50);
             exitButton.TabIndex = 4;
@@ -103,7 +106,7 @@ namespace Shooter_Game0._1.Forms
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(30, 30, 40);
-            ClientSize = new Size(484, 451);
+            ClientSize = new Size(484, 400);
             Controls.Add(exitButton);
             Controls.Add(leaderboardButton);
             Controls.Add(startButton);

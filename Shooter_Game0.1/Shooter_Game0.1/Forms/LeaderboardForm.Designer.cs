@@ -19,22 +19,29 @@ namespace Shooter_Game0._1.Forms
 
         private void InitializeComponent()
         {
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             titleLabel = new Label();
             scoresGrid = new DataGridView();
             closeButton = new Button();
+            Rank = new DataGridViewTextBoxColumn();
+            Username = new DataGridViewTextBoxColumn();
+            Score = new DataGridViewTextBoxColumn();
+            Date = new DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)scoresGrid).BeginInit();
             SuspendLayout();
             // 
             // titleLabel
             // 
-            titleLabel.AutoSize = true;
             titleLabel.Font = new Font("Segoe UI", 18F, FontStyle.Bold);
             titleLabel.ForeColor = Color.Gold;
-            titleLabel.Location = new Point(130, 15);
+            titleLabel.Location = new Point(10, 15);
             titleLabel.Name = "titleLabel";
-            titleLabel.Size = new Size(210, 32);
+            titleLabel.Size = new Size(529, 45);
             titleLabel.TabIndex = 0;
             titleLabel.Text = "🏆 LEADERBOARD";
+            titleLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // scoresGrid
             // 
@@ -44,31 +51,41 @@ namespace Shooter_Game0._1.Forms
             scoresGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             scoresGrid.BackgroundColor = Color.FromArgb(35, 35, 45);
             scoresGrid.BorderStyle = BorderStyle.None;
+            scoresGrid.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             scoresGrid.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
-            scoresGrid.ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
-            {
-                BackColor = Color.FromArgb(0, 120, 200),
-                ForeColor = Color.White,
-                Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-                SelectionBackColor = Color.FromArgb(0, 120, 200),
-                Alignment = DataGridViewContentAlignment.MiddleCenter
-            };
-            scoresGrid.DefaultCellStyle = new DataGridViewCellStyle
-            {
-                BackColor = Color.FromArgb(40, 40, 55),
-                ForeColor = Color.White,
-                Font = new Font("Consolas", 10F),
-                SelectionBackColor = Color.FromArgb(60, 60, 80),
-                SelectionForeColor = Color.White
-            };
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.BackColor = Color.FromArgb(50, 50, 65);
+            dataGridViewCellStyle1.ForeColor = Color.Gold;
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            dataGridViewCellStyle1.SelectionBackColor = Color.FromArgb(50, 50, 65);
+            dataGridViewCellStyle1.SelectionForeColor = Color.Gold;
+            scoresGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            scoresGrid.ColumnHeadersHeight = 35;
+            scoresGrid.Columns.AddRange(new DataGridViewColumn[] { Rank, Username, Score, Date });
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = Color.FromArgb(35, 35, 45);
+            dataGridViewCellStyle2.ForeColor = Color.White;
+            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9.5F);
+            dataGridViewCellStyle2.SelectionBackColor = Color.FromArgb(0, 100, 180);
+            dataGridViewCellStyle2.SelectionForeColor = Color.White;
+            scoresGrid.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle3.BackColor = Color.FromArgb(42, 42, 55);
+            dataGridViewCellStyle3.ForeColor = Color.White;
+            dataGridViewCellStyle3.Font = new Font("Segoe UI", 9.5F);
+            dataGridViewCellStyle3.SelectionBackColor = Color.FromArgb(0, 100, 180);
+            dataGridViewCellStyle3.SelectionForeColor = Color.White;
+            scoresGrid.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle3;
             scoresGrid.EnableHeadersVisualStyles = false;
-            scoresGrid.GridColor = Color.FromArgb(60, 60, 70);
-            scoresGrid.Location = new Point(20, 60);
+            scoresGrid.GridColor = Color.FromArgb(55, 55, 70);
+            scoresGrid.Location = new Point(23, 70);
+            scoresGrid.Margin = new Padding(3, 4, 3, 4);
             scoresGrid.Name = "scoresGrid";
             scoresGrid.ReadOnly = true;
             scoresGrid.RowHeadersVisible = false;
+            scoresGrid.RowHeadersWidth = 51;
+            scoresGrid.RowTemplate.Height = 32;
             scoresGrid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            scoresGrid.Size = new Size(440, 300);
+            scoresGrid.Size = new Size(503, 405);
             scoresGrid.TabIndex = 1;
             // 
             // closeButton
@@ -76,27 +93,58 @@ namespace Shooter_Game0._1.Forms
             closeButton.BackColor = Color.FromArgb(100, 100, 110);
             closeButton.Cursor = Cursors.Hand;
             closeButton.FlatAppearance.BorderSize = 0;
+            closeButton.FlatAppearance.MouseOverBackColor = Color.FromArgb(130, 130, 140);
             closeButton.FlatStyle = FlatStyle.Flat;
             closeButton.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
             closeButton.ForeColor = Color.White;
-            closeButton.Location = new Point(170, 375);
+            closeButton.Location = new Point(194, 490);
+            closeButton.Margin = new Padding(3, 4, 3, 4);
             closeButton.Name = "closeButton";
-            closeButton.Size = new Size(140, 40);
+            closeButton.Size = new Size(160, 48);
             closeButton.TabIndex = 2;
             closeButton.Text = "CLOSE";
             closeButton.UseVisualStyleBackColor = false;
             closeButton.Click += CloseButton_Click;
             // 
+            // Rank
+            // 
+            Rank.HeaderText = "Rank";
+            Rank.MinimumWidth = 6;
+            Rank.Name = "Rank";
+            Rank.ReadOnly = true;
+            // 
+            // Username
+            // 
+            Username.HeaderText = "Username";
+            Username.MinimumWidth = 6;
+            Username.Name = "Username";
+            Username.ReadOnly = true;
+            // 
+            // Score
+            // 
+            Score.HeaderText = "Score";
+            Score.MinimumWidth = 6;
+            Score.Name = "Score";
+            Score.ReadOnly = true;
+            // 
+            // Date
+            // 
+            Date.HeaderText = "Date";
+            Date.MinimumWidth = 6;
+            Date.Name = "Date";
+            Date.ReadOnly = true;
+            // 
             // LeaderboardForm
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(25, 25, 35);
-            ClientSize = new Size(480, 430);
+            ClientSize = new Size(549, 555);
             Controls.Add(closeButton);
             Controls.Add(scoresGrid);
             Controls.Add(titleLabel);
             FormBorderStyle = FormBorderStyle.FixedDialog;
+            Margin = new Padding(3, 4, 3, 4);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "LeaderboardForm";
@@ -106,5 +154,10 @@ namespace Shooter_Game0._1.Forms
             ResumeLayout(false);
             PerformLayout();
         }
+
+        private DataGridViewTextBoxColumn Rank;
+        private DataGridViewTextBoxColumn Username;
+        private DataGridViewTextBoxColumn Score;
+        private DataGridViewTextBoxColumn Date;
     }
 }

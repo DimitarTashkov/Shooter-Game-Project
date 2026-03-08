@@ -13,7 +13,6 @@ namespace Shooter_Game0._1.Forms
         private void LoadScores()
         {
             using var context = new ShooterGameContext();
-            context.Database.EnsureCreated();
 
             var scores = context.GetTopScores(10);
             scoresGrid.DataSource = scores.Select((s, i) => new

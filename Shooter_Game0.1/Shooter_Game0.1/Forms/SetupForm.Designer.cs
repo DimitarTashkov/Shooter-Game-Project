@@ -107,6 +107,7 @@ namespace Shooter_Game0._1.Forms
             beginButton.BackColor = Color.FromArgb(0, 150, 50);
             beginButton.Cursor = Cursors.Hand;
             beginButton.FlatAppearance.BorderSize = 0;
+            beginButton.FlatAppearance.MouseOverBackColor = Color.FromArgb(0, 180, 70);
             beginButton.FlatStyle = FlatStyle.Flat;
             beginButton.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
             beginButton.ForeColor = Color.White;

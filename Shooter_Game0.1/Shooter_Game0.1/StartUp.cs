@@ -1,4 +1,5 @@
-﻿using Shooter_Game0._1.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using Shooter_Game0._1.Data;
 using Shooter_Game0._1.Forms;
 
 namespace Shooter_Game0._1
@@ -8,10 +9,10 @@ namespace Shooter_Game0._1
         [STAThread]
         public static void Main(string[] args)
         {
-            // Ensure SQLite database exists on startup
+            // Apply any pending EF Core migrations at startup
             using (var context = new ShooterGameContext())
             {
-                context.Database.EnsureCreated();
+                context.Database.Migrate();
             }
 
             Application.EnableVisualStyles();
