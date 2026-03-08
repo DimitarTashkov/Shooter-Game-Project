@@ -12,21 +12,25 @@ namespace Shooter_Game0._1.Forms
 
         private void LoadScores()
         {
-            using var context = new ShooterGameContext();
-
-            var scores = context.GetTopScores(10);
-            scoresGrid.DataSource = scores.Select((s, i) => new
+            try
             {
-                Rank = i + 1,
-                s.Username,
-                s.Score,
-                Date = s.DateAchieved.ToString("yyyy-MM-dd HH:mm")
-            }).ToList();
+                using var context = new ShooterGameContext();
+                context.Database.EnsureCreated();
 
-            scoresGrid.Columns["Rank"].Width = 50;
-            scoresGrid.Columns["Username"].Width = 150;
-            scoresGrid.Columns["Score"].Width = 100;
-            scoresGrid.Columns["Date"].Width = 140;
+                var scores = context.GetTopScores(10);
+                scoresGrid.DataSource = scores.Select((s, i) => new
+                {
+                    Rank = i + 1,
+                    s.Username,
+                    s.Score,
+                    Date = s.DateAchieved.ToString("yyyy-MM-dd HH:mm")
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Could not load leaderboard: {ex.Message}",
+                    "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
         private void CloseButton_Click(object? sender, EventArgs e)

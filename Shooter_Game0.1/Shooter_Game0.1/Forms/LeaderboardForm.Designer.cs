@@ -61,6 +61,7 @@ namespace Shooter_Game0._1.Forms
             dataGridViewCellStyle1.SelectionForeColor = Color.Gold;
             scoresGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             scoresGrid.ColumnHeadersHeight = 35;
+            scoresGrid.AutoGenerateColumns = false;
             scoresGrid.Columns.AddRange(new DataGridViewColumn[] { Rank, Username, Score, Date });
             dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle2.BackColor = Color.FromArgb(35, 35, 45);
@@ -108,29 +109,37 @@ namespace Shooter_Game0._1.Forms
             // 
             // Rank
             // 
+            Rank.DataPropertyName = "Rank";
             Rank.HeaderText = "Rank";
-            Rank.MinimumWidth = 6;
+            Rank.FillWeight = 15;
+            Rank.MinimumWidth = 40;
             Rank.Name = "Rank";
             Rank.ReadOnly = true;
             // 
             // Username
             // 
+            Username.DataPropertyName = "Username";
             Username.HeaderText = "Username";
-            Username.MinimumWidth = 6;
+            Username.FillWeight = 35;
+            Username.MinimumWidth = 80;
             Username.Name = "Username";
             Username.ReadOnly = true;
             // 
             // Score
             // 
+            Score.DataPropertyName = "Score";
             Score.HeaderText = "Score";
-            Score.MinimumWidth = 6;
+            Score.FillWeight = 20;
+            Score.MinimumWidth = 60;
             Score.Name = "Score";
             Score.ReadOnly = true;
             // 
             // Date
             // 
+            Date.DataPropertyName = "Date";
             Date.HeaderText = "Date";
-            Date.MinimumWidth = 6;
+            Date.FillWeight = 30;
+            Date.MinimumWidth = 80;
             Date.Name = "Date";
             Date.ReadOnly = true;
             // 

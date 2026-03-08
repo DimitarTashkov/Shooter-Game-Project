@@ -255,6 +255,7 @@ namespace Shooter_Game0._1.Forms
             try
             {
                 using var context = new ShooterGameContext();
+                context.Database.EnsureCreated();
                 double score = controller.GetPlayerPoints(username);
                 context.SaveScore(username, score);
             }
