@@ -1,4 +1,5 @@
 ﻿using Shooter_Game0._1.Core.Contracts;
+using Shooter_Game0._1.Factories;
 using Shooter_Game0._1.IO;
 using Shooter_Game0._1.Models.Enemies.Contracts;
 using Shooter_Game0._1.Models.Map.Contracts;
@@ -21,6 +22,7 @@ namespace Shooter_Game0._1.Core
         private int oldYCoordinate;
 
         private string? selectedWeaponType;
+        private readonly EnemyFactory enemyFactory;
         private EnemiesRepository enemies;
         private WeaponsRepository weapons;
         private MapsRepository maps;
@@ -31,6 +33,7 @@ namespace Shooter_Game0._1.Core
         private Writer writer;
         public Controller()
         {
+            this.enemyFactory = new EnemyFactory();
             this.enemies = new EnemiesRepository();
             this.weapons = new WeaponsRepository();
             this.maps = new MapsRepository();
@@ -44,12 +47,29 @@ namespace Shooter_Game0._1.Core
         public IMap? CurrentMap => maps.Models().FirstOrDefault();
         public void SetWeaponType(string weaponType) => selectedWeaponType = weaponType;
         public string GetReport() => sb.ToString().Trim();
+
+        public double GetPlayerPoints(string username)
+        {
+            var user = users.Models().FirstOrDefault(u => u.Username == username);
+            return user?.Points ?? 0;
+        }
+
+        public IUser GetOrCreateUser(string username)
+        {
+            var user = users.Models().FirstOrDefault(u => u.Username == username);
+            if (user == null)
+            {
+                user = builder.CreateUser(username);
+                users.AddNew(user);
+            }
+            return user;
+        }
         public string GenerateEnemies(IMap map, int countOfEnemies)
         {
             map.GenerateTerrain();
             for (int i = 0; i < countOfEnemies; i++)
             {
-                IEnemy generatedEnemy = Randomizer.EnemiesRandomizer();
+                IEnemy generatedEnemy = enemyFactory.CreateRandomEnemy();
                 enemies.AddNew(generatedEnemy);
                 Dictionary<int, int> enemyCoordinates = Randomizer.EnemiesGenerationRandomizer(map);
                 while (map.CoordinateIsAlreadyInhabitated(enemyCoordinates, enemiesCoordinates.Enemiescoordinates)) 

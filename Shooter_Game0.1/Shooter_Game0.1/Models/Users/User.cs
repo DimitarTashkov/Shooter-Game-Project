@@ -16,6 +16,8 @@ namespace Shooter_Game0._1.Models.Users
         private double damageDealt;
         private double points;
 
+        public event EventHandler<UserStatsChangedEventArgs>? StatsChanged;
+
         public User(string username)
         {
             this.username = username;
@@ -40,6 +42,7 @@ namespace Shooter_Game0._1.Models.Users
             set
             {
                 enemiesKilled = value;
+                OnStatsChanged();
             }
         }
         public double DamageDealt
@@ -48,6 +51,7 @@ namespace Shooter_Game0._1.Models.Users
             set
             {
                 damageDealt = value;
+                OnStatsChanged();
             }
         }
         public double Points
@@ -56,8 +60,18 @@ namespace Shooter_Game0._1.Models.Users
             set
             {
                 points = value;
+                OnStatsChanged();
             }
         }
 
+        private void OnStatsChanged()
+        {
+            StatsChanged?.Invoke(this, new UserStatsChangedEventArgs
+            {
+                EnemiesKilled = enemiesKilled,
+                DamageDealt = damageDealt,
+                Points = points
+            });
+        }
     }
 }

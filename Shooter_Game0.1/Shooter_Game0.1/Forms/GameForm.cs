@@ -1,14 +1,14 @@
 using Shooter_Game0._1.Core;
+using Shooter_Game0._1.Data;
 using Shooter_Game0._1.Models.Enemies.Contracts;
 using Shooter_Game0._1.Models.Map.Contracts;
+using Shooter_Game0._1.Models.Users.Contracts;
 using Shooter_Game0._1.Utilities.Randomizer;
 
 namespace Shooter_Game0._1.Forms
 {
     public partial class GameForm : Form
     {
-        private const int CellSize = 64;
-
         private readonly string username;
         private readonly string weaponType;
         private readonly Controller controller;
@@ -16,6 +16,13 @@ namespace Shooter_Game0._1.Forms
 
         private int cursorRow;
         private int cursorCol;
+
+        /// <summary>
+        /// Dynamic cell size calculated from panel dimensions and map grid size.
+        /// Supports Phase 3: Dynamic Form Resizing.
+        /// </summary>
+        private int CellWidth => mapPanel.Width / Math.Max(map.Y, 1);
+        private int CellHeight => mapPanel.Height / Math.Max(map.X, 1);
 
         public GameForm(string username, string weaponType)
         {
@@ -39,13 +46,18 @@ namespace Shooter_Game0._1.Forms
             LogMessage("Click a cell or use WASD + Space to shoot.");
             LogMessage("Press H for hint, R for stats.");
 
+            // Observer Pattern: subscribe to user stats changes
+            IUser user = controller.GetOrCreateUser(username);
+            user.StatsChanged += OnUserStatsChanged;
+
             UpdateEnemiesLeft();
         }
 
         private void ApplyDynamicLayout()
         {
-            int mapPixelW = map.Y * CellSize;
-            int mapPixelH = map.X * CellSize;
+            const int baseCellSize = 64;
+            int mapPixelW = map.Y * baseCellSize;
+            int mapPixelH = map.X * baseCellSize;
             int logWidth = 360;
             int bottomBar = 55;
 
@@ -63,6 +75,15 @@ namespace Shooter_Game0._1.Forms
             weaponLabel.Text = $"Weapon: {weaponType}";
             hintButton.Location = new Point(mapPixelW - 230, mapPixelH + 15);
             endButton.Location = new Point(mapPixelW - 115, mapPixelH + 15);
+
+            // Phase 4: Enable optimized double buffering for flicker-free rendering
+            SetStyle(ControlStyles.OptimizedDoubleBuffer
+                   | ControlStyles.AllPaintingInWmPaint
+                   | ControlStyles.UserPaint, true);
+            UpdateStyles();
+
+            // Repaint map panel on resize
+            mapPanel.Resize += (s, e) => mapPanel.Invalidate();
         }
 
         // ═══════════════════════════════════════════
@@ -104,8 +125,8 @@ namespace Shooter_Game0._1.Forms
 
         private void MapPanel_MouseClick(object? sender, MouseEventArgs e)
         {
-            int col = e.X / CellSize;
-            int row = e.Y / CellSize;
+            int col = e.X / CellWidth;
+            int row = e.Y / CellHeight;
 
             if (row >= 0 && row < map.X && col >= 0 && col < map.Y)
             {
@@ -125,58 +146,63 @@ namespace Shooter_Game0._1.Forms
             Graphics g = e.Graphics;
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
+            int cw = CellWidth;
+            int ch = CellHeight;
+
             using var cellBrush = new SolidBrush(Color.FromArgb(50, 50, 60));
             using var gridPen = new Pen(Color.FromArgb(70, 70, 80));
-            using var coordFont = new Font("Consolas", 7);
+            using var coordFont = new Font("Consolas", Math.Max(cw / 10, 6));
 
             for (int row = 0; row < map.X; row++)
             {
                 for (int col = 0; col < map.Y; col++)
                 {
-                    int x = col * CellSize;
-                    int y = row * CellSize;
+                    int x = col * cw;
+                    int y = row * ch;
 
-                    g.FillRectangle(cellBrush, x + 1, y + 1, CellSize - 2, CellSize - 2);
-                    g.DrawRectangle(gridPen, x, y, CellSize, CellSize);
+                    g.FillRectangle(cellBrush, x + 1, y + 1, cw - 2, ch - 2);
+                    g.DrawRectangle(gridPen, x, y, cw, ch);
                     g.DrawString($"{row},{col}", coordFont, Brushes.DimGray, x + 2, y + 2);
                 }
             }
 
-            using var enemyFont = new Font("Segoe UI", 14, FontStyle.Bold);
+            float enemyFontSize = Math.Max(Math.Min(cw, ch) / 4.5f, 8f);
+            using var enemyFont = new Font("Segoe UI", enemyFontSize, FontStyle.Bold);
             foreach (var kvp in controller.EnemiesCoordinates)
             {
                 foreach (var pos in kvp.Key)
                 {
                     int row = pos.Key;
                     int col = pos.Value;
-                    int x = col * CellSize;
-                    int y = row * CellSize;
+                    int x = col * cw;
+                    int y = row * ch;
 
                     Color color = GetEnemyColor(kvp.Value);
                     using var brush = new SolidBrush(color);
 
-                    int pad = 8;
-                    g.FillEllipse(brush, x + pad, y + pad,
-                        CellSize - pad * 2, CellSize - pad * 2);
+                    int padX = cw / 8;
+                    int padY = ch / 8;
+                    g.FillEllipse(brush, x + padX, y + padY,
+                        cw - padX * 2, ch - padY * 2);
 
                     string initial = kvp.Value.GetType().Name[..1];
                     var sz = g.MeasureString(initial, enemyFont);
                     g.DrawString(initial, enemyFont, Brushes.White,
-                        x + (CellSize - sz.Width) / 2,
-                        y + (CellSize - sz.Height) / 2);
+                        x + (cw - sz.Width) / 2,
+                        y + (ch - sz.Height) / 2);
                 }
             }
 
-            int cx = cursorCol * CellSize;
-            int cy = cursorRow * CellSize;
+            int cx = cursorCol * cw;
+            int cy = cursorRow * ch;
             using var cursorPen = new Pen(Color.FromArgb(0, 180, 255), 3);
-            g.DrawRectangle(cursorPen, cx + 3, cy + 3, CellSize - 6, CellSize - 6);
+            g.DrawRectangle(cursorPen, cx + 3, cy + 3, cw - 6, ch - 6);
 
-            int mx = cx + CellSize / 2;
-            int my = cy + CellSize / 2;
+            int mx = cx + cw / 2;
+            int my = cy + ch / 2;
             using var crossPen = new Pen(Color.FromArgb(0, 180, 255), 1);
-            g.DrawLine(crossPen, mx - 14, my, mx + 14, my);
-            g.DrawLine(crossPen, mx, my - 14, mx, my + 14);
+            g.DrawLine(crossPen, mx - cw / 4, my, mx + cw / 4, my);
+            g.DrawLine(crossPen, mx, my - ch / 4, mx, my + ch / 4);
         }
 
         // ═══════════════════════════════════════════
@@ -226,6 +252,19 @@ namespace Shooter_Game0._1.Forms
             controller.StatsUpdate(username);
             string report = controller.GetReport();
 
+            // Save score to leaderboard database
+            try
+            {
+                using var context = new ShooterGameContext();
+                context.Database.EnsureCreated();
+                double score = controller.GetPlayerPoints(username);
+                context.SaveScore(username, score);
+            }
+            catch (Exception ex)
+            {
+                LogMessage($"[DB] Could not save score: {ex.Message}");
+            }
+
             MessageBox.Show(report, "Game Over — Final Report",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
 
@@ -239,6 +278,16 @@ namespace Shooter_Game0._1.Forms
         private void UpdateEnemiesLeft()
         {
             enemiesLeftLabel.Text = $"Enemies remaining: {controller.EnemiesCoordinates.Count}";
+        }
+
+        private void OnUserStatsChanged(object? sender, UserStatsChangedEventArgs e)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(() => OnUserStatsChanged(sender, e));
+                return;
+            }
+            statsLabel.Text = $"Kills: {e.EnemiesKilled} | Dmg: {Math.Round(e.DamageDealt, 1)} | Pts: {Math.Round(e.Points, 1)}";
         }
 
         private void LogMessage(string message)

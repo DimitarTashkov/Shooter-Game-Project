@@ -7,6 +7,7 @@ namespace Shooter_Game0._1.Forms
         private Label titleLabel;
         private Label subtitleLabel;
         private Button startButton;
+        private Button leaderboardButton;
         private Button exitButton;
 
         protected override void Dispose(bool disposing)
@@ -23,6 +24,7 @@ namespace Shooter_Game0._1.Forms
             titleLabel = new Label();
             subtitleLabel = new Label();
             startButton = new Button();
+            leaderboardButton = new Button();
             exitButton = new Button();
             SuspendLayout();
             // 
@@ -64,6 +66,22 @@ namespace Shooter_Game0._1.Forms
             startButton.UseVisualStyleBackColor = false;
             startButton.Click += StartButton_Click;
             // 
+            // leaderboardButton
+            // 
+            leaderboardButton.BackColor = Color.FromArgb(80, 80, 20);
+            leaderboardButton.Cursor = Cursors.Hand;
+            leaderboardButton.FlatAppearance.BorderSize = 0;
+            leaderboardButton.FlatStyle = FlatStyle.Flat;
+            leaderboardButton.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
+            leaderboardButton.ForeColor = Color.White;
+            leaderboardButton.Location = new Point(140, 230);
+            leaderboardButton.Name = "leaderboardButton";
+            leaderboardButton.Size = new Size(220, 50);
+            leaderboardButton.TabIndex = 3;
+            leaderboardButton.Text = "LEADERBOARD";
+            leaderboardButton.UseVisualStyleBackColor = false;
+            leaderboardButton.Click += LeaderboardButton_Click;
+            // 
             // exitButton
             // 
             exitButton.BackColor = Color.FromArgb(180, 40, 40);
@@ -72,10 +90,10 @@ namespace Shooter_Game0._1.Forms
             exitButton.FlatStyle = FlatStyle.Flat;
             exitButton.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
             exitButton.ForeColor = Color.White;
-            exitButton.Location = new Point(140, 250);
+            exitButton.Location = new Point(140, 310);
             exitButton.Name = "exitButton";
             exitButton.Size = new Size(220, 50);
-            exitButton.TabIndex = 3;
+            exitButton.TabIndex = 4;
             exitButton.Text = "EXIT";
             exitButton.UseVisualStyleBackColor = false;
             exitButton.Click += ExitButton_Click;
@@ -85,8 +103,9 @@ namespace Shooter_Game0._1.Forms
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(30, 30, 40);
-            ClientSize = new Size(484, 381);
+            ClientSize = new Size(484, 451);
             Controls.Add(exitButton);
+            Controls.Add(leaderboardButton);
             Controls.Add(startButton);
             Controls.Add(subtitleLabel);
             Controls.Add(titleLabel);

@@ -12,5 +12,17 @@ namespace Shooter_Game0._1.Models.Users.Contracts
         public int EnemiesKilled { get; set; }
         public double DamageDealt { get; set; }
         public double Points { get; set; }
+
+        /// <summary>
+        /// Observer Pattern: Fires when any stat changes so the UI can update automatically.
+        /// </summary>
+        event EventHandler<UserStatsChangedEventArgs>? StatsChanged;
+    }
+
+    public class UserStatsChangedEventArgs : EventArgs
+    {
+        public int EnemiesKilled { get; init; }
+        public double DamageDealt { get; init; }
+        public double Points { get; init; }
     }
 }

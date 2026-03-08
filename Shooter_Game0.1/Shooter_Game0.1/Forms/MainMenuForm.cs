@@ -23,5 +23,11 @@ namespace Shooter_Game0._1.Forms
         {
             Application.Exit();
         }
+
+        private void LeaderboardButton_Click(object? sender, EventArgs e)
+        {
+            using var leaderboardForm = new LeaderboardForm();
+            leaderboardForm.ShowDialog();
+        }
     }
 }
