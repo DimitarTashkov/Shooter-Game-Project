@@ -88,23 +88,15 @@ namespace Shooter_Game0._1.Core
                 MapY = map?.Y ?? 5
             };
 
-            foreach (var kvp in enemiesCoordinates.Enemiescoordinates)
+            state.Enemies = enemiesCoordinates.Enemiescoordinates.Select(kvp => new EnemyState
             {
-                var coords = kvp.Key;
-                int row = coords.Keys.First();
-                int col = coords[row];
-                var enemy = kvp.Value;
-
-                state.Enemies.Add(new EnemyState
-                {
-                    EnemyType = enemy.GetType().Name,
-                    Life = enemy.Life,
-                    IsAlreadyGenerated = enemy.IsAlreadyGenerated,
-                    IsEnemyKilled = enemy.IsEnemyKilled,
-                    Row = row,
-                    Col = col
-                });
-            }
+                EnemyType = kvp.Value.GetType().Name,
+                Life = kvp.Value.Life,
+                IsAlreadyGenerated = kvp.Value.IsAlreadyGenerated,
+                IsEnemyKilled = kvp.Value.IsEnemyKilled,
+                Row = kvp.Key.Keys.First(),
+                Col = kvp.Key.Values.First()
+            }).ToList();
 
             return state;
         }
@@ -241,19 +233,7 @@ namespace Shooter_Game0._1.Core
         }
         private IEnemy? ReturnEnemyFromCoordinates(int x, int y, Dictionary<Dictionary<int, int>, IEnemy> enemiesCoordinates)
         {
-            IEnemy? enemy = null;
-            foreach (var kvp in enemiesCoordinates)
-            {
-                Dictionary<int, int> coordinate = kvp.Key;
-
-                // Check if the current dictionary entry's coordinates match the target coordinates
-                if (coordinate.ContainsKey(x) && coordinate[x] == y)
-                {
-                    enemy = kvp.Value; // Assign the matching IEnemy to the 'enemy' variable
-                    break; // Exit the loop since we found the enemy
-                }
-            }
-            return enemy;
+            return enemiesCoordinates.FirstOrDefault(kvp => kvp.Key.ContainsKey(x) && kvp.Key[x] == y).Value;
         }
 
         public string Hint(int xCoordinate, int yCoordinate, string[,] terrain, Dictionary<Dictionary<int, int>, IEnemy> enemiesCoordinates)
