@@ -1,3 +1,5 @@
+using Shooter_Game0._1.Utilities.Serialization;
+
 namespace Shooter_Game0._1.Forms
 {
     public partial class MainMenuForm : Form
@@ -17,6 +19,21 @@ namespace Shooter_Game0._1.Forms
                 gameForm.FormClosed += (s, args) => Show();
                 gameForm.Show();
             }
+        }
+
+        private void LoadGameButton_Click(object? sender, EventArgs e)
+        {
+            var state = GameSerializer.LoadGame();
+            if (state == null)
+            {
+                MessageBox.Show("No saved game found.", "Load Game", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            Hide();
+            var gameForm = new GameForm(state);
+            gameForm.FormClosed += (s, args) => Show();
+            gameForm.Show();
         }
 
         private void ExitButton_Click(object? sender, EventArgs e)

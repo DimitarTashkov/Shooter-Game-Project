@@ -4,6 +4,8 @@ using Shooter_Game0._1.Models.Enemies.Contracts;
 using Shooter_Game0._1.Models.Map.Contracts;
 using Shooter_Game0._1.Models.Users.Contracts;
 using Shooter_Game0._1.Utilities.Randomizer;
+using Shooter_Game0._1.Models.SaveData;
+using Shooter_Game0._1.Models.Maps;
 
 namespace Shooter_Game0._1.Forms
 {
@@ -55,6 +57,48 @@ namespace Shooter_Game0._1.Forms
             UpdateEnemiesLeft();
         }
 
+        public GameForm(SessionState state)
+        {
+            this.username = state.Username;
+            this.weaponType = state.WeaponType;
+
+            controller = new Controller();
+
+            if (state.MapType == "DefaultMap")
+            {
+                map = new DefaultMap();
+            }
+            else
+            {
+                map = new CustomMap(state.MapX, state.MapY);
+            }
+
+            InitializeComponent();
+            ApplyDynamicLayout();
+
+            controller.LoadSessionState(state, map);
+
+            foreach (var log in state.CombatLog)
+            {
+                LogMessage(log);
+            }
+
+            LogMessage($"--- Game Loaded ---");
+
+            foreach (var move in state.MoveHistory)
+            {
+                moveHistory.Push((move.Row, move.Col));
+            }
+
+            IUser user = controller.GetOrCreateUser(username);
+            user.StatsChanged += OnUserStatsChanged;
+            
+            // Trigger stats change to update UI labels
+            user.Points = user.Points; 
+
+            UpdateEnemiesLeft();
+        }
+
         private void ApplyDynamicLayout()
         {
             const int baseCellSize = 64;
@@ -76,14 +120,17 @@ namespace Shooter_Game0._1.Forms
             weaponLabel.Location = new Point(10, mapPixelH + 20);
             weaponLabel.Text = $"Weapon: {weaponType}";
 
-            int buttonWidth = (logWidth - 10) / 3;
+            int buttonWidth = (logWidth - 15) / 4;
             hintButton.Location = new Point(mapPixelW + 20, mapPixelH + 10);
             hintButton.Size = new Size(buttonWidth, 38);
 
             undoButton.Location = new Point(mapPixelW + 20 + buttonWidth + 5, mapPixelH + 10);
             undoButton.Size = new Size(buttonWidth, 38);
 
-            endButton.Location = new Point(mapPixelW + 20 + (buttonWidth + 5) * 2, mapPixelH + 10);
+            saveButton.Location = new Point(mapPixelW + 20 + (buttonWidth + 5) * 2, mapPixelH + 10);
+            saveButton.Size = new Size(buttonWidth, 38);
+
+            endButton.Location = new Point(mapPixelW + 20 + (buttonWidth + 5) * 3, mapPixelH + 10);
             endButton.Size = new Size(buttonWidth, 38);
 
             // Phase 4: Enable optimized double buffering for flicker-free rendering
@@ -330,11 +377,23 @@ namespace Shooter_Game0._1.Forms
         {
             if (string.IsNullOrWhiteSpace(message)) return;
 
-            foreach (string line in message.Split(
-                Environment.NewLine, StringSplitOptions.RemoveEmptyEntries))
+            int maxExtent = combatLog.HorizontalExtent;
+
+            using (Graphics g = combatLog.CreateGraphics())
             {
-                combatLog.Items.Add(line);
+                foreach (string line in message.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    combatLog.Items.Add(line);
+
+                    int extent = (int)g.MeasureString(line, combatLog.Font).Width;
+                    if (extent > maxExtent)
+                    {
+                        maxExtent = extent;
+                    }
+                }
             }
+
+            combatLog.HorizontalExtent = maxExtent + 20;
 
             if (combatLog.Items.Count > 0)
                 combatLog.TopIndex = combatLog.Items.Count - 1;
@@ -351,6 +410,27 @@ namespace Shooter_Game0._1.Forms
 
         private void HintButton_Click(object? sender, EventArgs e) => ShowHint();
         private void UndoButton_Click(object? sender, EventArgs e) => UndoLastMove();
+        private void SaveButton_Click(object? sender, EventArgs e) => SaveGame();
         private void EndButton_Click(object? sender, EventArgs e) => EndGame();
+
+        private void SaveGame()
+        {
+            var state = controller.GetSessionState(username);
+            
+            foreach (var item in combatLog.Items)
+            {
+                state.CombatLog.Add(item.ToString() ?? string.Empty);
+            }
+            
+            var moves = moveHistory.ToList();
+            moves.Reverse();
+            foreach (var m in moves)
+            {
+                state.MoveHistory.Add(new MoveState { Row = m.row, Col = m.col });
+            }
+
+            Shooter_Game0._1.Utilities.Serialization.GameSerializer.SaveGame(state);
+            LogMessage("[SYSTEM] Game successfully saved!");
+        }
     }
 }

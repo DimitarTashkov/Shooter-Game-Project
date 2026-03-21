@@ -10,6 +10,7 @@ using Shooter_Game0._1.Utilities.Hinter;
 using Shooter_Game0._1.Utilities.Messages;
 using Shooter_Game0._1.Utilities.Randomizer;
 using Shooter_Game0._1.Core.Commands;
+using Shooter_Game0._1.Models.SaveData;
 using System.Text;
 
 namespace Shooter_Game0._1.Core
@@ -48,6 +49,7 @@ namespace Shooter_Game0._1.Core
             commandManager = new CommandManager();
         }
         public Dictionary<Dictionary<int, int>, IEnemy> EnemiesCoordinates => enemiesCoordinates.Enemiescoordinates;
+        public int EnemiesCoordinatesCount => enemiesCoordinates.Enemiescoordinates.Count; // Helper if needed
         public IMap? CurrentMap => maps.Models().FirstOrDefault();
         public void SetWeaponType(string weaponType) => selectedWeaponType = weaponType;
         public string GetReport() => sb.ToString().Trim();
@@ -67,6 +69,73 @@ namespace Shooter_Game0._1.Core
                 users.AddNew(user);
             }
             return user;
+        }
+
+        public SessionState GetSessionState(string username)
+        {
+            IUser user = GetOrCreateUser(username);
+            IMap? map = CurrentMap;
+
+            var state = new SessionState
+            {
+                Username = username,
+                WeaponType = selectedWeaponType ?? "Pistol",
+                DamageDealt = user.DamageDealt,
+                EnemiesKilled = user.EnemiesKilled,
+                Points = user.Points,
+                MapType = map?.GetType().Name ?? "DefaultMap",
+                MapX = map?.X ?? 5,
+                MapY = map?.Y ?? 5
+            };
+
+            foreach (var kvp in enemiesCoordinates.Enemiescoordinates)
+            {
+                var coords = kvp.Key;
+                int row = coords.Keys.First();
+                int col = coords[row];
+                var enemy = kvp.Value;
+
+                state.Enemies.Add(new EnemyState
+                {
+                    EnemyType = enemy.GetType().Name,
+                    Life = enemy.Life,
+                    IsAlreadyGenerated = enemy.IsAlreadyGenerated,
+                    IsEnemyKilled = enemy.IsEnemyKilled,
+                    Row = row,
+                    Col = col
+                });
+            }
+
+            return state;
+        }
+
+        public void LoadSessionState(SessionState state, IMap map)
+        {
+            // Reset existing collections manually or rebuild them
+            // In typical scenario, Controller is fresh when calling this
+            maps.AddNew(map);
+            selectedWeaponType = state.WeaponType;
+
+            IUser user = builder.CreateUser(state.Username);
+            user.DamageDealt = state.DamageDealt;
+            user.EnemiesKilled = state.EnemiesKilled;
+            user.Points = state.Points;
+            users.AddNew(user);
+
+            foreach (var es in state.Enemies)
+            {
+                IEnemy enemy = enemyFactory.CreateEnemy(es.EnemyType);
+                enemy.Life = es.Life;
+                enemy.IsAlreadyGenerated = es.IsAlreadyGenerated;
+                enemy.IsEnemyKilled = es.IsEnemyKilled;
+
+                Dictionary<int, int> coords = new Dictionary<int, int> { { es.Row, es.Col } };
+                enemies.AddNew(enemy);
+                enemiesCoordinates.AddEnemy(coords, enemy);
+            }
+
+            map.GenerateTerrain();
+            map.VisualizeMap(map.Terrain);
         }
 
         public string UndoLastAction()

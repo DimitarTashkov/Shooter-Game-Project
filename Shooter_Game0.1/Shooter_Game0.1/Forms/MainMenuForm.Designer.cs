@@ -7,6 +7,7 @@ namespace Shooter_Game0._1.Forms
         private Label titleLabel;
         private Label subtitleLabel;
         private Button startButton;
+        private Button loadGameButton;
         private Button leaderboardButton;
         private Button exitButton;
 
@@ -24,6 +25,7 @@ namespace Shooter_Game0._1.Forms
             titleLabel = new Label();
             subtitleLabel = new Label();
             startButton = new Button();
+            loadGameButton = new Button();
             leaderboardButton = new Button();
             exitButton = new Button();
             SuspendLayout();
@@ -67,6 +69,23 @@ namespace Shooter_Game0._1.Forms
             startButton.UseVisualStyleBackColor = false;
             startButton.Click += StartButton_Click;
             // 
+            // loadGameButton
+            // 
+            loadGameButton.BackColor = Color.FromArgb(40, 140, 180);
+            loadGameButton.Cursor = Cursors.Hand;
+            loadGameButton.FlatAppearance.BorderSize = 0;
+            loadGameButton.FlatAppearance.MouseOverBackColor = Color.FromArgb(60, 170, 210);
+            loadGameButton.FlatStyle = FlatStyle.Flat;
+            loadGameButton.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
+            loadGameButton.ForeColor = Color.White;
+            loadGameButton.Location = new Point(132, 220);
+            loadGameButton.Name = "loadGameButton";
+            loadGameButton.Size = new Size(220, 50);
+            loadGameButton.TabIndex = 3;
+            loadGameButton.Text = "LOAD GAME";
+            loadGameButton.UseVisualStyleBackColor = false;
+            loadGameButton.Click += LoadGameButton_Click;
+            // 
             // leaderboardButton
             // 
             leaderboardButton.BackColor = Color.FromArgb(140, 110, 20);
@@ -76,10 +95,10 @@ namespace Shooter_Game0._1.Forms
             leaderboardButton.FlatStyle = FlatStyle.Flat;
             leaderboardButton.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
             leaderboardButton.ForeColor = Color.White;
-            leaderboardButton.Location = new Point(132, 220);
+            leaderboardButton.Location = new Point(132, 290);
             leaderboardButton.Name = "leaderboardButton";
             leaderboardButton.Size = new Size(220, 50);
-            leaderboardButton.TabIndex = 3;
+            leaderboardButton.TabIndex = 4;
             leaderboardButton.Text = "LEADERBOARD";
             leaderboardButton.UseVisualStyleBackColor = false;
             leaderboardButton.Click += LeaderboardButton_Click;
@@ -93,10 +112,10 @@ namespace Shooter_Game0._1.Forms
             exitButton.FlatStyle = FlatStyle.Flat;
             exitButton.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
             exitButton.ForeColor = Color.White;
-            exitButton.Location = new Point(132, 290);
+            exitButton.Location = new Point(132, 360);
             exitButton.Name = "exitButton";
             exitButton.Size = new Size(220, 50);
-            exitButton.TabIndex = 4;
+            exitButton.TabIndex = 5;
             exitButton.Text = "EXIT";
             exitButton.UseVisualStyleBackColor = false;
             exitButton.Click += ExitButton_Click;
@@ -106,9 +125,10 @@ namespace Shooter_Game0._1.Forms
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(30, 30, 40);
-            ClientSize = new Size(484, 400);
+            ClientSize = new Size(484, 440);
             Controls.Add(exitButton);
             Controls.Add(leaderboardButton);
+            Controls.Add(loadGameButton);
             Controls.Add(startButton);
             Controls.Add(subtitleLabel);
             Controls.Add(titleLabel);
