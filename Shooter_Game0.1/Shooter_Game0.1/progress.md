@@ -105,3 +105,50 @@ Shooter_Game0.1/
 | **Observer** | Behavioral | `IUser.StatsChanged` event → `GameForm.OnUserStatsChanged()` |
 | **Builder** | Creational | `DataBuilder` (pre-existing, creates all entity types) |
 | **Repository** | Architectural | `EnemiesRepository`, `WeaponsRepository`, etc. (pre-existing) |
+
+---
+
+## Game Improvements Plan (Game_improvements.md)
+
+### Task 1: Delegates and Events (Observer Pattern) - Stage 1 ✅ Complete
+| Item | Status | File(s) |
+|---|---|---|
+| Create `StatsChanged` event in `User` model | ✅ | `Models/Users/Contracts/IUser.cs`, `Models/Users/User.cs` |
+| Invoke event on points, kills, or health changes | ✅ | `Models/Users/User.cs` |
+| `GameForm` subscribes to event and updates UI | ✅ | `Forms/GameForm.cs` |
+
+### Task 2: Command Pattern for UI Operations - Stage 2 ✅ Complete
+| Item | Status | File(s) |
+|---|---|---|
+| Create `ICommand` interface with `Execute()` and `Undo()` | ✅ | `Core/Contracts/ICommand.cs` |
+| Implement `ShootCommand : ICommand` | ✅ | `Core/Commands/ShootCommand.cs` |
+| `Execute()` applies damage and saves state for Undo | ✅ | `Core/Commands/ShootCommand.cs` |
+| Integrate command invocation in `GameForm` | ✅ | `Core/Controller.cs`, `Forms/GameForm.cs` |
+
+### Task 3: Operation History (Undo / Redo) - Stage 2 ✅ Complete
+| Item | Status | File(s) |
+|---|---|---|
+| Create `CommandManager` or Stack in Controller | ✅ | `Core/Commands/CommandManager.cs`, `Core/Controller.cs` |
+| Push each executed command to the history stack | ✅ | `Core/Commands/CommandManager.cs` |
+| Implement `UndoLastAction()` | ✅ | `Core/Controller.cs` |
+| Add hotkey (Ctrl+Z) or Undo button in `GameForm` | ✅ | `Forms/GameForm.cs` |
+
+### Task 4: State Preservation via Serialization - Stage 3 ⏳ Pending
+| Item | Status | File(s) |
+|---|---|---|
+| `SaveGame(filepath)` method for serialization (JSON) | ⏳ | - |
+| `LoadGame(filepath)` method for deserialization | ⏳ | - |
+| "Save Game" and "Load Game" buttons in UI | ⏳ | - |
+
+### Task 5: Validate and expand LINQ operations - Stage 3 🔄 Partial
+| Item | Status | File(s) |
+|---|---|---|
+| Use at least 4 different LINQ operations (e.g. Where, FirstOrDefault, OrderByDescending, Select/Sum) | 🔄 | `Core/Controller.cs`, `Data/ShooterGameContext.cs` |
+
+### Task 6: Extract Reusable Logic (Class Library) - Stage 3 ⏳ Pending
+| Item | Status | File(s) |
+|---|---|---|
+| Create new Class Library project (`ShooterGame.Core`) | ⏳ | - |
+| Move Models, Repositories, Core, Factories logic | ⏳ | - |
+| Remove dependencies to Windows.Forms and Drawing | ⏳ | - |
+| Reference `ShooterGame.Core` in the UI project | ⏳ | - |

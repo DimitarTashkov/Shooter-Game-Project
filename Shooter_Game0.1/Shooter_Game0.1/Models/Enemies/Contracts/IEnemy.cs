@@ -12,7 +12,7 @@ namespace Shooter_Game0._1.Models.Enemies.Contracts
        public int EnemySize { get; }
         public double EnemyHealth { get; }
         public double Life { get; set; }
-        public bool IsAlreadyGenerated { get; }
+        public bool IsAlreadyGenerated { get; set; }
         public bool IsEnemyKilled { get; set; }
        public abstract string RegenHealth();
         public void RunCoordinates(IMap map, IEnemy enemy, Dictionary<Dictionary<int, int>, IEnemy> enemiesCoordinates);

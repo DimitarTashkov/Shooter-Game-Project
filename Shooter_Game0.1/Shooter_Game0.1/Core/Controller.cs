@@ -9,6 +9,7 @@ using Shooter_Game0._1.Repositories;
 using Shooter_Game0._1.Utilities.Hinter;
 using Shooter_Game0._1.Utilities.Messages;
 using Shooter_Game0._1.Utilities.Randomizer;
+using Shooter_Game0._1.Core.Commands;
 using System.Text;
 
 namespace Shooter_Game0._1.Core
@@ -31,6 +32,8 @@ namespace Shooter_Game0._1.Core
         private StringBuilder sb;
         private EnemiesCoordinatesRepository enemiesCoordinates;
         private Writer writer;
+        private CommandManager commandManager;
+
         public Controller()
         {
             this.enemyFactory = new EnemyFactory();
@@ -42,6 +45,7 @@ namespace Shooter_Game0._1.Core
             this.sb = new StringBuilder();
             this.writer = new Writer();
             enemiesCoordinates = new EnemiesCoordinatesRepository();
+            commandManager = new CommandManager();
         }
         public Dictionary<Dictionary<int, int>, IEnemy> EnemiesCoordinates => enemiesCoordinates.Enemiescoordinates;
         public IMap? CurrentMap => maps.Models().FirstOrDefault();
@@ -64,6 +68,25 @@ namespace Shooter_Game0._1.Core
             }
             return user;
         }
+
+        public string UndoLastAction()
+        {
+            if (commandManager.HasHistory)
+            {
+                commandManager.UndoPreviousCommand();
+                
+                IMap? map = maps.Models().FirstOrDefault();
+                if (map != null)
+                {
+                    // Redraw map with restored enemy positions
+                    map.VisualizeMap(map.Terrain);
+                }
+                
+                return "Action undone.";
+            }
+            return "No more actions to undo.";
+        }     
+
         public string GenerateEnemies(IMap map, int countOfEnemies)
         {
             map.GenerateTerrain();
@@ -91,9 +114,8 @@ namespace Shooter_Game0._1.Core
             return sb.ToString().Trim();
         }
 
-        public string Shoot(int xCoordinate, int yCoordinate)
+        public string Shoot(int xCoordinate, int yCoordinate, string username)
         {
-
             sb.Clear();
 
             IMap? map = maps.Models().FirstOrDefault();
@@ -102,50 +124,32 @@ namespace Shooter_Game0._1.Core
                 throw new InvalidOperationException(ExceptionMessages.MapHasNotBeenAdded);
             }
 
-            Dictionary<int, int> aimCoordinates = new();
-            aimCoordinates.Add(xCoordinate, yCoordinate);
-
             IWeapon weapon = selectedWeaponType != null
                 ? builder.CreateWeapon(selectedWeaponType)
                 : Randomizer.WeaponsRandomizer();
+            
             IEnemy? enemy = ReturnEnemyFromCoordinates(xCoordinate, yCoordinate, enemiesCoordinates.Enemiescoordinates);
             weapons.AddNew(weapon);
+            IUser user = GetOrCreateUser(username);
 
             map.Terrain[oldXCoordinate, oldYCoordinate] = "-";
             oldXCoordinate = xCoordinate;
             oldYCoordinate = yCoordinate;
-
-            if (enemy == null)
-            {
-                writer.WriteLine(Environment.NewLine);
-                map.Terrain[xCoordinate, yCoordinate] = "+";
-                map.VisualizeMap(map.Terrain);
-                return string.Format(OutputMessages.NoEnemyInThisLocation, xCoordinate, yCoordinate);
-            }
-                weapon.CalculateDamage();
-                double remain = weapon.Damage - enemy.Life;
-                if (remain <= 0)
-                {
-                collectDealtDamage += weapon.Damage;
-                    enemy.Life -= weapon.Damage;
-                    sb.AppendLine(string.Format(OutputMessages.EnemyWasShotFor, enemy.GetType().Name, weapon.Damage, weapon.GetType().Name,xCoordinate,yCoordinate));
-                    sb.AppendLine(enemy.RegenHealth());
-                enemiesCoordinates.RemoveEnemy(aimCoordinates);
-                    enemy.RunCoordinates(map, enemy, enemiesCoordinates.Enemiescoordinates);                   
-
-                }
-                else
-                {
-                collectDealtDamage += weapon.Damage;
-                enemiesCoordinates.RemoveEnemy(aimCoordinates);
-                    collectKills++;
-                    sb.AppendLine(string.Format(OutputMessages.EnemyWasKilled, enemy.GetType().Name, weapon.GetType().Name,xCoordinate,yCoordinate,enemiesCoordinates.Enemiescoordinates.Count));
-                    enemy.IsEnemyKilled = true;
-                    
-                }
             map.Terrain[xCoordinate, yCoordinate] = "+";
+            
+            var shootCommand = new ShootCommand(
+                enemy, weapon, user, map, enemiesCoordinates, xCoordinate, yCoordinate);
+            
+            commandManager.ExecuteCommand(shootCommand);
+
             map.VisualizeMap(map.Terrain);
-            return sb.ToString().Trim();
+            return shootCommand.ResultMessage;
+        }
+
+        // Keep the old signature for compatibility, if called elsewhere without username
+        public string Shoot(int xCoordinate, int yCoordinate)
+        {
+            return Shoot(xCoordinate, yCoordinate, "Default");
         }
 
         public void StatsUpdate(string username)

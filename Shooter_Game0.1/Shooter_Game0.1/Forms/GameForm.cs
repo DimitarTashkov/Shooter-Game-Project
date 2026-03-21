@@ -91,6 +91,14 @@ namespace Shooter_Game0._1.Forms
 
         private void GameForm_KeyDown(object? sender, KeyEventArgs e)
         {
+            if (e.Control && e.KeyCode == Keys.Z)
+            {
+                UndoLastMove();
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+                return;
+            }
+
             switch (e.KeyCode)
             {
                 case Keys.W or Keys.Up:
@@ -120,6 +128,14 @@ namespace Shooter_Game0._1.Forms
             mapPanel.Invalidate();
             e.Handled = true;
             e.SuppressKeyPress = true;
+        }
+
+        private void UndoLastMove()
+        {
+            string result = controller.UndoLastAction();
+            LogMessage(result);
+            UpdateEnemiesLeft();
+            mapPanel.Invalidate();
         }
 
         private void MapPanel_MouseClick(object? sender, MouseEventArgs e)
@@ -216,7 +232,7 @@ namespace Shooter_Game0._1.Forms
                 return;
             }
 
-            string result = controller.Shoot(row, col);
+            string result = controller.Shoot(row, col, username);
             LogMessage(result);
             UpdateEnemiesLeft();
 

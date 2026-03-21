@@ -1,37 +1,53 @@
-# Shooter Game: Advanced Features & Polish Plan
+# План за внедряване на липсващите функционалности (Shooter Game)
 
-## 1. Context
-We have successfully migrated the "Shooter Game" from a Console Application to a Windows Forms application. The core OOP logic (`Models`, `Repositories`, `Controller`) is intact. 
+## Контекст
+Проектът е "Shooter Game" – десктоп приложение на Windows Forms с C#. Проектът трябва да отговори на специфични академични изисквания по ООП, структури от данни и архитектура. Голяма част от базовата логика (йерархия на враговете `Enemies`, оръжията `Weapons`, бази данни с EF Core за класацията) е налична.
 
-## 2. Goal
-I want to upgrade this game for my university OOP course project. We need to implement proper Gang of Four (GoF) design patterns, integrate a local database for a Leaderboard, and polish the WinForms UI with dynamic resizing and smooth rendering.
-
-Please act as a Senior .NET WinForms Expert and implement the following phases one at a time when I ask for them.
+**Цел на агента:** Да се имплементират липсващите функционалности съгласно изискванията, като се спазват добрите практики и архитектурата на проекта. Моля, изпълнявай задачите последователно и питай за потвърждение след всяка ключова стъпка.
 
 ---
 
-## 3. Execution Phases
+## Задача 1: Делегати и Събития (Observer Pattern) - Етап 1
+**Описание:** Графичният интерфейс трябва да се обновява автоматично при промяна на данните, без да проверява непрекъснато (polling).
+* **Действие 1:** В модела `User` (или в `Controller`) да се създаде събитие `StatsChanged` (с използване на `EventHandler` или `Action`).
+* **Действие 2:** Събитието да се извиква (invoke) всеки път, когато играчът спечели точки, убие враг или промени здравето си.
+* **Действие 3:** В `GameForm.cs` формата да се абонира за това събитие при инициализацията и в хендлъра да обновява текстовите полета (Labels) за точки и брой убийства.
 
-### Phase 1: Database Integration (The Leaderboard)
-* **Tech Stack:** Use **Entity Framework Core** with **SQLite** (`Microsoft.EntityFrameworkCore.Sqlite`). This keeps the database local and lightweight.
-* **Models:** Create a `PlayerScore` entity (Id, Username, Score, DateAchieved).
-* **DbContext:** Create a `ShooterGameContext` to manage the SQLite connection. Ensure it auto-creates the database on startup (`Database.EnsureCreated()`).
-* **UI:** Create a `LeaderboardForm` that reads from the database and displays the top 10 scores in a `DataGridView`. Add a "View Leaderboard" button to the `MainMenuForm`.
+## Задача 2: Command Pattern за UI операциите - Етап 2
+**Описание:** Логиката за действията на потребителя (стрелба, хинт) да се изнесе от събитията на формата (като `KeyDown` или `MouseClick`) в отделна йерархия от класове (Command Pattern).
+* **Действие 1:** Да се създаде интерфейс `ICommand` с методи `void Execute()` и `void Undo()`.
+* **Действие 2:** Да се реализира клас `ShootCommand : ICommand`. Този клас трябва да приема необходимите параметри през конструктора (мишена `IEnemy`, оръжие `IWeapon`, референция към играча `IUser`).
+* **Действие 3:** Методът `Execute()` на `ShootCommand` да нанася щетите на врага и да добавя точките на играча. В класа трябва да се запази и предишното състояние (напр. колко здраве е имал врагът преди изстрела), за да може да се направи Undo.
+* **Действие 4:** Да се интегрира извикването на командите в `GameForm` (при клик за стрелба се създава `ShootCommand` и се изпълнява).
 
-### Phase 2: Design Patterns Application (Crucial for OOP Grade)
-1. **Factory Method Pattern:** * Remove direct instantiations of enemies (e.g., `new Orc()`). 
-   * Create an `EnemyFactory` class with a method `IEnemy CreateEnemy(string type, int x, int y)`. Use this inside the `Controller` to spawn enemies dynamically.
-2. **Observer Pattern (Events):**
-   * Decouple the UI from the Models. Add a `HealthChanged` event to the `IUser` interface and `User` class.
-   * Make the `GameForm` subscribe to this event. When the player takes damage, the event fires, and the `GameForm` updates the Health Bar UI automatically.
+## Задача 3: История на операциите (Undo / Redo) - Етап 2
+**Описание:** Възможност за връщане на последния изстрел (Undo).
+* **Действие 1:** Да се създаде клас `CommandManager` (или да се добави `Stack<ICommand>` в `Controller`-а).
+* **Действие 2:** Всяка изпълнена команда да се добавя (Push) в стека с историята.
+* **Действие 3:** Да се реализира метод `UndoLastAction()`, който взима (Pop) последната команда от стека и извиква нейния `Undo()` метод (възстановявайки здравето на врага и премахвайки точките).
+* **Действие 4:** Да се добави клавишна комбинация (напр. `Ctrl+Z`) или бутон `Undo` в `GameForm`, който да извиква тази функционалност.
 
-### Phase 3: Dynamic Form Resizing 
-Instead of hardcoding the rendering coordinates to a specific screen size (like 800x600), we need the game to support window resizing natively.
-* **Logic:** Update the rendering logic in `GameForm.OnPaint`. Calculate the *relative* position of entities based on a base resolution, and scale them according to the actual `ClientSize.Width` and `ClientSize.Height` of the current Form.
-* Example: If the player is at `X=400` on an `800` wide map, their relative X is `0.5f`. If the window is resized to `1920` wide, render the player at `1920 * 0.5f` (`960`).
+## Задача 4: Съхранение на информация чрез Сериализация - Етап 3
+**Описание:** Функционалност за запазване (Save) и зареждане (Load) на текущата игрова сесия във файл (независимо от базата данни за класацията).
+* **Действие 1:** Да се използва `System.Text.Json` или `System.Xml.Serialization`.
+* **Действие 2:** Да се напише метод `SaveGame(string filePath)`, който сериализира текущото състояние на играта: обекта на потребителя (`User`), текущото оръжие и списъка с живи врагове (`List<IEnemy>`) заедно с техните координати.
+* **Действие 3:** Да се напише метод `LoadGame(string filePath)`, който десериализира файла и възстановява обектите.
+* **Действие 4:** Да се добавят бутони: "Save Game" в `GameForm` (записва в `savegame.json`) и "Load Game" в `MainMenuForm` (зарежда от `savegame.json` и отваря `GameForm` с възстановените данни).
 
-### Phase 4: Gameplay Polish & Rendering
-1. **Smooth Graphics:** Ensure the `GameForm` has Double Buffering enabled in its constructor to completely eliminate screen flickering:
-   ```csharp
-   this.DoubleBuffered = true;
-   this.SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint, true);
+## Задача 5: Проверка и допълване на LINQ операциите - Етап 3
+**Описание:** Да се гарантира използването на поне 4 различни LINQ операции в проекта.
+* **Действие 1:** Да се рефакторират части от репозиториите или контролера, така че да съдържат ясно изразени LINQ заявки.
+* **Примерни цели:** 1. `Where` (филтриране на мъртви врагове).
+  2. `FirstOrDefault` (намиране на враг по координати).
+  3. `OrderByDescending` (подреждане на класацията).
+  4. `Select` или `Sum` (калкулации или трансформиране на колекции за UI).
+
+## Задача 6: Отделяне на преизползваема логика (Class Library) - Етап 3
+**Описание:** Гарантиране, че архитектурата разделя UI от бизнес логиката.
+* **Действие 1:** Ако в момента моделите, интерфейсите и контролерът са в същия проект като Windows Forms, агентът трябва да създаде нов Class Library проект (напр. `ShooterGame.Core`).
+* **Действие 2:** Да премести всички папки `Models`, `Repositories`, `Core`, `Factories` в новия проект и да премахне зависимостите към `System.Windows.Forms` и `System.Drawing` от тях.
+* **Действие 3:** UI проектът да реферира `ShooterGame.Core`.
+
+---
+**Инструкции към Агента:**
+Моля, започни със **Задача 1**. Анализирай текущите файлове `User.cs`, `Controller.cs` и `GameForm.cs`, и предложи конкретния код за събитието `StatsChanged`!
