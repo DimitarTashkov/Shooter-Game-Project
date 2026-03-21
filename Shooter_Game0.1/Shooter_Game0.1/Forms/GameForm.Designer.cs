@@ -10,6 +10,7 @@ namespace Shooter_Game0._1.Forms
         private Label enemiesLeftLabel;
         private Label weaponLabel;
         private Button hintButton;
+        private Button undoButton;
         private Button endButton;
 
         protected override void Dispose(bool disposing)
@@ -29,6 +30,7 @@ namespace Shooter_Game0._1.Forms
             enemiesLeftLabel = new Label();
             weaponLabel = new Label();
             hintButton = new Button();
+            undoButton = new Button();
             endButton = new Button();
             SuspendLayout();
             // 
@@ -105,6 +107,23 @@ namespace Shooter_Game0._1.Forms
             hintButton.UseVisualStyleBackColor = false;
             hintButton.Click += HintButton_Click;
             // 
+            // undoButton
+            // 
+            undoButton.BackColor = Color.FromArgb(180, 40, 40);
+            undoButton.Cursor = Cursors.Hand;
+            undoButton.FlatAppearance.BorderSize = 0;
+            undoButton.FlatAppearance.MouseOverBackColor = Color.FromArgb(210, 60, 60);
+            undoButton.FlatStyle = FlatStyle.Flat;
+            undoButton.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            undoButton.ForeColor = Color.White;
+            undoButton.Location = new Point(480, 342);
+            undoButton.Name = "undoButton";
+            undoButton.Size = new Size(110, 38);
+            undoButton.TabIndex = 6;
+            undoButton.Text = "UNDO (Ctrl+Z)";
+            undoButton.UseVisualStyleBackColor = false;
+            undoButton.Click += UndoButton_Click;
+            // 
             // endButton
             // 
             endButton.BackColor = Color.FromArgb(180, 40, 40);
@@ -129,6 +148,7 @@ namespace Shooter_Game0._1.Forms
             BackColor = Color.FromArgb(25, 25, 35);
             ClientSize = new Size(710, 395);
             Controls.Add(endButton);
+            Controls.Add(undoButton);
             Controls.Add(hintButton);
             Controls.Add(weaponLabel);
             Controls.Add(enemiesLeftLabel);

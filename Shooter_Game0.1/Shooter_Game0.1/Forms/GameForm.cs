@@ -17,6 +17,8 @@ namespace Shooter_Game0._1.Forms
         private int cursorRow;
         private int cursorCol;
 
+        private readonly Stack<(int row, int col)> moveHistory = new();
+
         /// <summary>
         /// Dynamic cell size calculated from panel dimensions and map grid size.
         /// Supports Phase 3: Dynamic Form Resizing.
@@ -44,7 +46,7 @@ namespace Shooter_Game0._1.Forms
             LogMessage($"Equipped weapon: {weaponType}");
             LogMessage(result);
             LogMessage("Click a cell or use WASD + Space to shoot.");
-            LogMessage("Press H for hint, R for stats.");
+            LogMessage("Press H for hint, R for stats, Ctrl+Z to undo.");
 
             // Observer Pattern: subscribe to user stats changes
             IUser user = controller.GetOrCreateUser(username);
@@ -74,6 +76,15 @@ namespace Shooter_Game0._1.Forms
             weaponLabel.Location = new Point(10, mapPixelH + 20);
             weaponLabel.Text = $"Weapon: {weaponType}";
 
+            int buttonWidth = (logWidth - 10) / 3;
+            hintButton.Location = new Point(mapPixelW + 20, mapPixelH + 10);
+            hintButton.Size = new Size(buttonWidth, 38);
+
+            undoButton.Location = new Point(mapPixelW + 20 + buttonWidth + 5, mapPixelH + 10);
+            undoButton.Size = new Size(buttonWidth, 38);
+
+            endButton.Location = new Point(mapPixelW + 20 + (buttonWidth + 5) * 2, mapPixelH + 10);
+            endButton.Size = new Size(buttonWidth, 38);
 
             // Phase 4: Enable optimized double buffering for flicker-free rendering
             SetStyle(ControlStyles.OptimizedDoubleBuffer
@@ -134,6 +145,14 @@ namespace Shooter_Game0._1.Forms
         {
             string result = controller.UndoLastAction();
             LogMessage(result);
+
+            if (result == "Action undone." && moveHistory.Count > 0)
+            {
+                var lastMove = moveHistory.Pop();
+                cursorRow = lastMove.row;
+                cursorCol = lastMove.col;
+            }
+
             UpdateEnemiesLeft();
             mapPanel.Invalidate();
         }
@@ -232,6 +251,8 @@ namespace Shooter_Game0._1.Forms
                 return;
             }
 
+            moveHistory.Push((row, col));
+
             string result = controller.Shoot(row, col, username);
             LogMessage(result);
             UpdateEnemiesLeft();
@@ -329,6 +350,7 @@ namespace Shooter_Game0._1.Forms
         };
 
         private void HintButton_Click(object? sender, EventArgs e) => ShowHint();
+        private void UndoButton_Click(object? sender, EventArgs e) => UndoLastMove();
         private void EndButton_Click(object? sender, EventArgs e) => EndGame();
     }
 }
