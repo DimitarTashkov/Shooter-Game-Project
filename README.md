@@ -6,7 +6,7 @@
 
 A **2D tactical grid shooter** built with Windows Forms, designed as a deep exploration of **Advanced OOP**, **Design Patterns**, and **LINQ** in C#. Every enemy type, weapon, and game mechanic is driven by polymorphism — not `if/else` chains.
 
-![Main Game](Images/main_game.png)
+![Main Game](Images/game_map.png)
 
 ---
 
