@@ -36,7 +36,7 @@ namespace Shooter_Game0._1.Forms.MiniGames
             _moveTimer = new System.Windows.Forms.Timer { Interval = 500 };
             _moveTimer.Tick += (s, e) => { RandomizeTargetPosition(); _gamePanel.Invalidate(); };
             _moveTimer.Start();
-
+            
             _gameTimer = new System.Windows.Forms.Timer { Interval = 100 };
             _gameTimer.Tick += GameTimer_Tick;
             _gameTimer.Start();

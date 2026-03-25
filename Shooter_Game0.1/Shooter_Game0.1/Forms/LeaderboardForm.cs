@@ -1,4 +1,7 @@
-using Shooter_Game0._1.Data;
+// File: Forms/LeaderboardForm.cs
+using Shooter_Game0._1.Repositories;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace Shooter_Game0._1.Forms
 {
@@ -12,25 +15,21 @@ namespace Shooter_Game0._1.Forms
 
         private void LoadScores()
         {
-            try
-            {
-                using var context = new ShooterGameContext();
-                context.Database.EnsureCreated();
+            var repo = new UsersRepository();
 
-                var scores = context.GetTopScores(10);
-                scoresGrid.DataSource = scores.Select((s, i) => new
+            var scores = repo.Models()
+                .OrderByDescending(u => u.Points)
+                .Take(10)
+                .Select((u, i) => new
                 {
-                    Rank = i + 1,
-                    s.Username,
-                    s.Score,
-                    Date = s.DateAchieved.ToString("yyyy-MM-dd HH:mm")
-                }).ToList();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Could not load leaderboard: {ex.Message}",
-                    "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
+                    Rank          = i + 1,
+                    u.Username,
+                    Score         = u.Points,
+                    EnemiesKilled = u.EnemiesKilled
+                })
+                .ToList();
+
+            scoresGrid.DataSource = scores;
         }
 
         private void CloseButton_Click(object? sender, EventArgs e)
