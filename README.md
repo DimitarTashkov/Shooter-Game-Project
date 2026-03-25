@@ -1,378 +1,232 @@
-# 🎯 Shooter Game
+# Shooter Game
 
-A **grid-based tactical shooter** built with **C# 14**, **.NET 10**, and **Windows Forms**.  
-Navigate a dynamically generated map, hunt enemies, and climb the leaderboard.
+![C#](https://img.shields.io/badge/C%23-12.0-239120?style=for-the-badge&logo=csharp&logoColor=white)
+![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
+![Windows Forms](https://img.shields.io/badge/Windows%20Forms-Desktop-0078D6?style=for-the-badge&logo=windows&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
 
-![.NET 10](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet)
-![C#](https://img.shields.io/badge/C%23-14.0-239120?logo=csharp)
-![WinForms](https://img.shields.io/badge/UI-Windows%20Forms-0078D4)
-![SQLite](https://img.shields.io/badge/DB-SQLite-003B57?logo=sqlite)
-![License](https://img.shields.io/badge/License-MIT-yellow)
+A **2D tactical grid shooter** built with Windows Forms, designed as a deep exploration of **Advanced OOP**, **Design Patterns**, and **LINQ** in C#. Every enemy type, weapon, and game mechanic is driven by polymorphism — not `if/else` chains.
 
----
-
-## 📑 Table of Contents
-
-- [Overview](#-overview)
-- [Screenshots](#-screenshots)
-- [Features](#-features)
-- [Architecture](#-architecture)
-- [Getting Started](#-getting-started)
-- [How to Play](#-how-to-play)
-- [Enemies](#-enemies)
-- [Weapons](#-weapons)
-- [Project Structure](#-project-structure)
-- [Design Patterns](#-design-patterns)
-- [Tech Stack](#-tech-stack)
-- [Testing](#-testing)
-- [Contributing](#-contributing)
+![Main Game](Images/main_game.png)
 
 ---
 
-## 🔭 Overview
+## Table of Contents
 
-Originally a console application, **Shooter Game** has been modernized into a full Windows Forms desktop game with GDI+ rendering, SQLite persistence, and clean OOP architecture. Players pick a weapon, enter a randomly generated grid map, and eliminate enemies by clicking cells or using keyboard controls. Scores are saved to a local SQLite database and displayed on a persistent leaderboard.
-
----
-
-## 📸 Screenshots
-
-> **Note:** The game uses a dark theme with GDI+ custom-rendered graphics. Below are text representations of each screen.
-
-### Main Menu
-
-```
-┌──────────────────────────────────────┐
-│                                      │
-│          SHOOTER GAME                │
-│      Console-to-WinForms Edition     │
-│                                      │
-│         ┌────────────────┐           │
-│         │   START GAME   │           │
-│         └────────────────┘           │
-│         ┌────────────────┐           │
-│         │  LEADERBOARD   │           │
-│         └────────────────┘           │
-│         ┌────────────────┐           │
-│         │      EXIT      │           │
-│         └────────────────┘           │
-│                                      │
-└──────────────────────────────────────┘
-```
-
-### Game Setup
-
-```
-┌───────────────────────────────┐
-│                               │
-│  Enter Username:              │
-│  ┌───────────────────────┐    │
-│  │ Player1               │    │
-│  └───────────────────────┘    │
-│                               │
-│  Select Weapon:               │
-│    ◉ Rifle   (20% headshot)   │
-│    ○ Shotgun (33% headshot)   │
-│    ○ Sniper  (10% headshot)   │
-│                               │
-│  ┌───────────────────────┐    │
-│  │        BEGIN          │    │
-│  └───────────────────────┘    │
-└───────────────────────────────┘
-```
-
-### Gameplay
-
-```
-┌────────────────────────────────────────────────────────────┐
-│                                                            │
-│  ┌─────────────────────┐  ┌──────────────────────────────┐ │
-│  │  ·  ·  ·  ·  ·  ·  │  │ Welcome, Player1!            │ │
-│  │  ·  · (O) ·  ·  ·  │  │ Equipped weapon: Rifle       │ │
-│  │  ·  ·  ·  · (T) ·  │  │ 10 enemies generated on map  │ │
-│  │  · [+] ·  ·  ·  ·  │  │ Click a cell or use WASD     │ │
-│  │  ·  ·  · (W) ·  ·  │  │ > Orc was shot for 440 dmg   │ │
-│  │  ·  ·  ·  ·  · (Z) │  │ > Orc has regenerated 180    │ │
-│  └─────────────────────┘  │ > No enemy at [2,1]          │ │
-│                            └──────────────────────────────┘ │
-│  Weapon: Rifle             Kills: 3 | Dmg: 1820 | Pts: 1507│
-│                            Enemies remaining: 7             │
-│                            ┌───────────┐  ┌──────────────┐  │
-│                            │  HINT (H) │  │  END GAME    │  │
-│                            └───────────┘  └──────────────┘  │
-└────────────────────────────────────────────────────────────┘
-
-Legend:  (O) Orc  (T) Tank  (W) Warrior  (Z) Wizard  [+] Cursor
-```
-
-### Leaderboard
-
-```
-┌─────────────────────────────────────┐
-│                                     │
-│         🏆 LEADERBOARD              │
-│                                     │
-│  ┌─────┬───────────┬───────┬──────┐ │
-│  │Rank │ Username  │ Score │ Date │ │
-│  ├─────┼───────────┼───────┼──────┤ │
-│  │  1  │ Player1   │ 4520  │ 03-08│ │
-│  │  2  │ ProGamer  │ 3200  │ 03-07│ │
-│  │  3  │ Newbie    │ 1100  │ 03-06│ │
-│  └─────┴───────────┴───────┴──────┘ │
-│                                     │
-│           ┌──────────┐              │
-│           │  CLOSE   │              │
-│           └──────────┘              │
-└─────────────────────────────────────┘
-```
+- [Overview](#overview)
+- [Core Features](#core-features)
+- [The Mini-Games (Deep Dive)](#-the-mini-games-deep-dive)
+- [Weapon Mechanics](#-weapon-mechanics)
+- [Difficulty Breakdown](#difficulty-breakdown)
+- [Architecture & Patterns](#architecture--patterns)
+- [How to Play](#how-to-play)
+- [Screenshots](#screenshots)
 
 ---
 
-## ✨ Features
+## Overview
+
+You are dropped onto a randomized grid map populated with hostile enemies. Pick your weapon, choose your difficulty, and eliminate every target on the board. Each enemy type fights back with a **unique polymorphic mini-game** when hit — reflexes, memory, and sequencing skills are all put to the test.
+
+Your score is tracked in real time via the **Observer pattern**, every shot is undoable via the **Command pattern**, and your final stats are persisted to a **JSON-serialized leaderboard**.
+
+---
+
+## Core Features
 
 | Feature | Description |
 |---|---|
-| **Dynamic Maps** | Grid dimensions are randomized each game (2×2 up to 9×9) |
-| **GDI+ Rendering** | Smooth anti-aliased graphics with double buffering for flicker-free gameplay |
-| **4 Enemy Types** | Orc, Tank, Warrior, Wizard — each with unique HP, size, and regeneration |
-| **3 Weapons** | Rifle, Shotgun, Sniper — each with different damage and headshot chances |
-| **Hint System** | Press **H** to get directional hints toward the nearest enemy |
-| **Live Stats** | Real-time kill count, damage, and point tracking via Observer pattern |
-| **Leaderboard** | Top 10 scores persisted in SQLite with alternating-row styling |
-| **Keyboard + Mouse** | Full WASD/Arrow + Space controls, or point-and-click on the grid |
+| **4 Enemy Types** | Orc, Warrior, Wizard, Tank — each with unique health, regeneration, and mini-games |
+| **3 Weapons** | Rifle, Shotgun, Sniper — each with a distinct special action that fires inside mini-games |
+| **3 Difficulty Levels** | Easy, Medium, Hard — Hard enables enemy rebirth and visual impairments (blackouts) |
+| **Polymorphic Mini-Games** | Hit an enemy and their `SpecialMove()` opens a type-specific challenge |
+| **Undo System** | Full state snapshots via the Command pattern — press Ctrl+Z to reverse any shot |
+| **Live Stats (Observer)** | Kills, damage, and points update the UI in real time through event subscription |
+| **JSON Leaderboard** | Top 10 scores serialized to `leaderboard.json` — fully portable, no database |
+| **Save / Load Game** | Full session state (map, enemies, combat log, move history) serialized to `savegame.json` |
+| **Keyboard + Mouse** | WASD / Arrow movement, Space / Enter / Click to shoot, H for hint, Ctrl+Z to undo |
 
 ---
 
-## 🏗 Architecture
+## The Mini-Games (Deep Dive)
+
+When you land a hit on an enemy, there is a **30% chance** their `SpecialMove()` triggers — opening a mini-game determined entirely by the enemy's concrete type at runtime. This is polymorphism in action: the caller never knows which game will open. It simply calls `enemy.SpecialMove(difficulty, weaponType)` and gets back `true` (you win) or `false` (you lose and the enemy steals **150 points**).
+
+Every mini-game also fires the equipped weapon's `SpecialAction()` the moment it opens — adding recoil, a jam clearance, or a breath-hold overlay on top of the challenge.
+
+---
+
+### Orc — Target Pursuit
+
+A green target **teleports** to a random position every 500ms. Click it within **3 seconds** before it vanishes again.
+
+- **Hard Mode**: Random 300ms blackout flashes every 1.2 seconds hide the entire arena.
+
+![Orc Mini-Game](Images/orc_minigame.png)
+
+---
+
+### Warrior — Velocity Strike
+
+A fast-moving red target **bounces** off the edges of the arena. Track it and click it within **3 seconds**.
+
+- **Hard Mode**: Target velocity jumps from 7 to 9. Blackouts hit every 1 second.
+
+![Warrior Mini-Game](Images/warrior_minigame.png)
+
+---
+
+### Wizard — Illusion Gambit
+
+Three circles appear — one **real Wizard** (larger, purple, marked "W") and two **clones** (smaller, grey, marked "?"). You get **8 seconds** and a single click. Pick the real one or fail.
+
+- **Hard Mode**: Blackouts every 1.2 seconds. One wrong click ends it immediately.
+
+![Wizard Mini-Game](Images/wizard_minigame.png)
+
+---
+
+### Tank — Shield Sequence
+
+Three shields spawn in randomized positions — **Small** (blue), **Medium** (orange), **Large** (red). Click them in the correct order (**Small -> Medium -> Large**) within **5 seconds**. Click the wrong shield and you fail instantly.
+
+- **Hard Mode**: 300ms blackouts every 1.2 seconds obscure the field while you sequence.
+
+![Tank Mini-Game](Images/tank_minigame.png)
+
+---
+
+## Weapon Mechanics
+
+Every weapon has a `SpecialAction()` that fires **inside the mini-game forms**, layering an additional challenge on top of each enemy encounter.
+
+| Weapon | Base Damage | Headshot Chance | Special Action |
+|---|---|---|---|
+| **Rifle** | 440 | ~5% | Recoil — cursor physically displaced + "RECOIL!" flash |
+| **Shotgun** | 297 | ~10% | Jam — must press Space 5 times in 5 seconds to unjam or lose the turn |
+| **Sniper** | 800 | ~10% | Hold Breath — "+50% accuracy" overlay for 2 seconds |
+
+### Sniper — Hold Breath
+When a mini-game opens, a cyan banner appears: **"HOLDING BREATH — AIM STEADY (+50% accuracy)"**. It lingers for 2 seconds, giving you a visual cue that your aim is enhanced. Highest single-shot damage in the game.
+
+### Shotgun — Jam Clearance
+Before the mini-game begins, a separate **Jam Clearance** form opens. Press **Space 5 times within 5 seconds** to clear the jam. Fail, and your entire turn is forfeit — the shot never fires.
+
+### Rifle — Recoil Kick
+The moment the mini-game opens, your cursor is physically displaced by a random offset and a **"RECOIL!"** flash appears for 600ms. Balanced damage with steady headshot odds.
+
+---
+
+## Difficulty Breakdown
+
+| Aspect | Easy | Medium | Hard |
+|---|---|---|---|
+| Enemy Rebirth Chance | 10% | 25% | 40% |
+| Warrior / Tank Rebirth | Never | Never | Active (40%) |
+| Mini-Game Blackouts | Off | Off | On |
+| Warrior Mini-Game Speed | Normal (7) | Normal (7) | Boosted (9) |
+| Mini-Game Loss Penalty | -150 pts | -150 pts | -150 pts |
+
+On **Hard**, when a Warrior or Tank is reduced to 0 HP, they have a **40% chance to be reborn** with 25% of their maximum health and repositioned on the map — forcing you to hunt them down again.
+
+---
+
+## Architecture & Patterns
 
 ```
-                    ┌──────────┐
-                    │ StartUp  │
-                    └────┬─────┘
-                         │
-                 ┌───────▼───────┐
-                 │ MainMenuForm  │
-                 └───┬───────┬───┘
-                     │       │
-            ┌────────▼──┐  ┌─▼──────────────┐
-            │ SetupForm │  │ LeaderboardForm │
-            └────┬──────┘  └────────────────┘
-                 │
-            ┌────▼─────┐
-            │ GameForm  │──────► GDI+ Rendering
-            └────┬──────┘
-                 │
-            ┌────▼──────┐
-            │ Controller │
-            └──┬───┬──┬─┘
-               │   │  │
-    ┌──────────▼┐ ┌▼──▼──────────┐
-    │Repositories│ │ EnemyFactory │
-    │ (Users,   │ └──────────────┘
-    │  Enemies, │
-    │  Weapons, │
-    │  Maps)    │
-    └───────────┘
+Shooter_Game0.1/
+  Core/
+    Commands/         # ShootCommand, CommandManager (Command Pattern)
+    Contracts/        # ICommand interface
+    Controller.cs     # Central game orchestration
+  Models/
+    Enemies/          # Abstract Enemy -> Orc, Warrior, Wizard, Tank
+    Weapons/          # Abstract Weapons -> Rifle, Shotgun, Sniper
+    Users/            # User + IUser with StatsChanged event (Observer)
+    SaveData/         # SessionState, EnemyState, MoveState (JSON DTOs)
+  Repositories/       # Generic IRepository<T> -> UsersRepository (JSON persistence)
+  Forms/
+    MiniGames/        # OrcMiniGameForm, WarriorMiniGameForm, WizardMiniGameForm,
+                      # TankMiniGameForm, ShotgunJamForm
+  Utilities/          # Difficulty enum, Randomizer, GameSerializer
+```
+
+### Command Pattern — Undo System
+
+Every shot creates a `ShootCommand` that **snapshots** the full enemy state (life, coordinates, kill status) and user stats (damage, kills, points) before execution. Pressing **Ctrl+Z** pops the command stack and restores the previous state — a true, lossless undo.
+
+### Observer Pattern — Live Stats
+
+The `User` class fires a `StatsChanged` event every time `EnemiesKilled`, `DamageDealt`, or `Points` is set. `GameForm` subscribes once at startup and the stats bar updates automatically with zero polling.
+
+### Polymorphism Everywhere
+
+- **Enemies**: `enemy.SpecialMove()` dispatches to the correct mini-game form at runtime.
+- **Weapons**: `weapon.SpecialAction(form)` applies recoil, jam, or breath-hold depending on the concrete type.
+- **Rebirth**: `enemy.TryRebirth(difficulty)` — Warrior and Tank override the base class to restrict rebirth to Hard difficulty only.
+
+### Scoring Formula
+
+```
+Points = (EnemiesKilled x 300) + (TotalDamageDealt / 3)
 ```
 
 ---
 
-## 🚀 Getting Started
+## How to Play
 
-### Prerequisites
+### Option A — Download the Release (Recommended)
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) or later
-- Windows (Windows Forms requires the Windows desktop runtime)
-- Visual Studio 2022/2026+ (recommended) or any .NET-compatible IDE
+1. Go to the [**Releases**](../../releases) tab.
+2. Download the latest `.zip` archive.
+3. Extract and run **`Shooter_Game0.1.exe`**. No install required.
 
-### Build & Run
+### Option B — Build from Source
 
 ```bash
-# Clone the repository
 git clone https://github.com/DimitarTashkov/Shooter-Game-Project.git
-cd Shooter-Game-Project
-
-# Restore and build
+cd Shooter-Game-Project/Shooter_Game0.1
 dotnet build
-
-# Run the game
 dotnet run --project Shooter_Game0.1
 ```
 
-The SQLite database (`shootergame.db`) is created automatically on first use — no manual setup needed.
+> Requires [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) or later on Windows.
 
-### Run Tests
+### Controls
 
-```bash
-dotnet test
-```
-
----
-
-## 🎮 How to Play
-
-1. **Launch** the game and click **START GAME**
-2. **Enter** your username and **select a weapon**
-3. **Navigate** the grid:
-
-   | Input | Action |
-   |---|---|
-   | `W` / `↑` | Move cursor up |
-   | `S` / `↓` | Move cursor down |
-   | `A` / `←` | Move cursor left |
-   | `D` / `→` | Move cursor right |
-   | `Space` / `Enter` | Shoot at cursor position |
-   | `H` | Get a hint (nearest enemy direction) |
-   | `R` | Show current stats |
-   | **Mouse click** | Shoot at clicked cell |
-
-4. **Eliminate all enemies** to complete the round
-5. Click **END GAME** to save your score and see the final report
-
-### Scoring
-
-```
-Points = (Enemies Killed × 300) + (Total Damage Dealt ÷ 3)
-```
-
----
-
-## 👾 Enemies
-
-| Enemy | Size | Base HP | Life (Size × HP) | Regen (% of Life) | Color |
-|---|---|---|---|---|---|
-| **Orc** | 15 | 40 | 600 | 30% (180) | 🟢 Green |
-| **Wizard** | 25 | 50 | 1,250 | 20% (250) | 🟣 Purple |
-| **Warrior** | 30 | 30 | 900 | 10% (90) | 🔴 Crimson |
-| **Tank** | 50 | 80 | 4,000 | 40% (1,600) | ⚪ Gray |
-
-- Each enemy **regenerates health once** after the first hit
-- Enemies **relocate** to a new random cell after surviving a shot
-- Rendered as colored circles with a letter initial on the map
-
----
-
-## 🔫 Weapons
-
-| Weapon | Ammo | Power | Damage Formula | Headshot Chance |
-|---|---|---|---|---|
-| **Rifle** | 22 | 20 | `Ammo × Power` = 440 | 20% (1 in 5) |
-| **Shotgun** | 9 | 33 | `Ammo × Power` = 297 | 33% (1 in 3) |
-| **Sniper** | 1 | 800 | `Ammo × Power` = 800 | 10% (1 in 10) |
-
-- On a **headshot**, damage is multiplied (bonus hit)
-- Weapon is locked for the entire game session based on your setup choice
-
----
-
-## 📁 Project Structure
-
-```
-Shooter-Game-Project/
-├── Shooter_Game0.1/                    # Main game project
-│   ├── Core/
-│   │   ├── Controller.cs               # Central game logic & orchestration
-│   │   ├── DataBuilder.cs              # Builder pattern: creates game objects
-│   │   ├── Engine.cs                   # Legacy console engine
-│   │   └── Contracts/                  # IController, IEngine, IDataBuilder
-│   ├── Data/
-│   │   ├── ShooterGameContext.cs       # EF Core DbContext (SQLite)
-│   │   └── PlayerScore.cs             # Leaderboard entity
-│   ├── Factories/
-│   │   └── EnemyFactory.cs            # Factory Method pattern
-│   ├── Forms/
-│   │   ├── MainMenuForm.cs/.Designer.cs
-│   │   ├── SetupForm.cs/.Designer.cs
-│   │   ├── GameForm.cs/.Designer.cs    # GDI+ rendering, input handling
-│   │   └── LeaderboardForm.cs/.Designer.cs
-│   ├── Models/
-│   │   ├── Enemies/
-│   │   │   ├── Contracts/IEnemy.cs
-│   │   │   └── Models/                 # Orc, Tank, Warrior, Wizard
-│   │   ├── Maps/
-│   │   │   ├── Contracts/IMap.cs
-│   │   │   └── Map.cs, DefaultMap.cs, CustomMap.cs
-│   │   ├── Users/
-│   │   │   ├── Contracts/IUser.cs      # Observer pattern events
-│   │   │   └── User.cs
-│   │   └── Weapons/
-│   │       ├── Contracts/IWeapon.cs
-│   │       └── Models/                 # Rifle, Shotgun, Sniper
-│   ├── Repositories/                   # In-memory collections
-│   │   ├── EnemiesRepository.cs
-│   │   ├── EnemiesCoordinatesRepository.cs
-│   │   ├── WeaponsRepository.cs
-│   │   ├── MapsRepository.cs
-│   │   └── UsersRepository.cs
-│   ├── Utilities/
-│   │   ├── Hinter/Hinter.cs           # Directional hint algorithm
-│   │   ├── Messages/                   # Output & exception message constants
-│   │   └── Randomizer/Randomizer.cs   # Map, enemy, weapon randomization
-│   ├── IO/                             # Legacy console reader/writer
-│   ├── Migrations/                     # EF Core SQLite migrations
-│   └── StartUp.cs                      # Application entry point
-├── Shooter_Game0.1-Tests/              # NUnit test project
-│   └── UnitTest1.cs
-└── README.md
-```
-
----
-
-## 🧩 Design Patterns
-
-| Pattern | Where | Purpose |
-|---|---|---|
-| **Factory Method** | `EnemyFactory` | Centralizes enemy creation, eliminates scattered `new` calls |
-| **Builder** | `DataBuilder` | Constructs enemies, weapons, maps, and users from string identifiers |
-| **Observer** | `IUser.StatsChanged` | Real-time UI stat updates when kills/damage change |
-| **Repository** | `*Repository` classes | In-memory collections with add/remove/query abstraction |
-| **MVC-like** | Forms ↔ Controller | Forms handle display; `Controller` owns all game logic |
-
----
-
-## 🛠 Tech Stack
-
-| Layer | Technology |
+| Input | Action |
 |---|---|
-| **Language** | C# 14.0 |
-| **Runtime** | .NET 10 (Windows Desktop) |
-| **UI** | Windows Forms + GDI+ custom painting |
-| **Database** | SQLite via Entity Framework Core 10 |
-| **Testing** | NUnit 3 + NUnit3TestAdapter |
-| **IDE** | Visual Studio 2026 |
+| `W A S D` / Arrow Keys | Move crosshair |
+| `Space` / `Enter` / Left Click | Shoot |
+| `Ctrl + Z` | Undo last shot |
+| `H` | Directional hint toward nearest enemy |
+| `R` | Show current stats |
 
 ---
 
-## 🧪 Testing
+## Screenshots
 
-The project includes an **NUnit** test suite in `Shooter_Game0.1-Tests/`.
+| Main Menu | Setup Screen |
+|---|---|
+| ![Main Menu](Images/main_menu.png) | ![Setup](Images/setup.png) |
 
-```bash
-# Run all tests
-dotnet test
-
-# Run from Visual Studio
-# Test Explorer → Run All
-```
+| Gameplay | Leaderboard |
+|---|---|
+| ![Main Game](Images/main_game.png) | ![Leaderboard](Images/leaderboard.png) |
 
 ---
 
-## 🤝 Contributing
+## Enemies at a Glance
 
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/my-feature`)
-3. **Commit** your changes (`git commit -m "Add my feature"`)
-4. **Push** to the branch (`git push origin feature/my-feature`)
-5. **Open** a Pull Request
-
----
-
-## 👤 Author
-
-**Dimitar Tashkov** — [GitHub](https://github.com/DimitarTashkov)
+| Enemy | HP Pool | Regen (once) | Mini-Game | Color |
+|---|---|---|---|---|
+| **Orc** | 600 | 30% (180 HP) | Target Pursuit — click a teleporting target | Green |
+| **Warrior** | 900 | 10% (90 HP) | Velocity Strike — click a bouncing target | Crimson |
+| **Wizard** | 1,250 | 20% (250 HP) | Illusion Gambit — find the real wizard among clones | Purple |
+| **Tank** | 4,000 | 40% (1,600 HP) | Shield Sequence — click shields in order | Grey |
 
 ---
 
 <p align="center">
-  Made with ❤️ in C# &nbsp;|&nbsp; ⭐ Star the repo if you enjoyed the game!
+  <b>Dimitar Tashkov</b> — <a href="https://github.com/DimitarTashkov">GitHub</a>
 </p>
