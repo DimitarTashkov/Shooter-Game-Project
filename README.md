@@ -6,7 +6,7 @@
 
 A **2D tactical grid shooter** built with Windows Forms, designed as a deep exploration of **Advanced OOP**, **Design Patterns**, and **LINQ** in C#. Every enemy type, weapon, and game mechanic is driven by polymorphism — not `if/else` chains.
 
-![Main Game](Images/main_game.png)
+![Main Game](Images/game%20map.png)
 
 ---
 
@@ -61,7 +61,7 @@ A green target **teleports** to a random position every 500ms. Click it within *
 
 - **Hard Mode**: Random 300ms blackout flashes every 1.2 seconds hide the entire arena.
 
-![Orc Mini-Game](Images/orc_minigame.png)
+![Orc Mini-Game](Images/orc%20mini%20game.png)
 
 ---
 
@@ -71,7 +71,7 @@ A fast-moving red target **bounces** off the edges of the arena. Track it and cl
 
 - **Hard Mode**: Target velocity jumps from 7 to 9. Blackouts hit every 1 second.
 
-![Warrior Mini-Game](Images/warrior_minigame.png)
+![Warrior Mini-Game](Images/warrior%20mini%20game.png)
 
 ---
 
@@ -81,7 +81,7 @@ Three circles appear — one **real Wizard** (larger, purple, marked "W") and tw
 
 - **Hard Mode**: Blackouts every 1.2 seconds. One wrong click ends it immediately.
 
-![Wizard Mini-Game](Images/wizard_minigame.png)
+![Wizard Mini-Game](Images/wizard%20mini%20game.png)
 
 ---
 
@@ -91,7 +91,7 @@ Three shields spawn in randomized positions — **Small** (blue), **Medium** (or
 
 - **Hard Mode**: 300ms blackouts every 1.2 seconds obscure the field while you sequence.
 
-![Tank Mini-Game](Images/tank_minigame.png)
+![Tank Mini-Game](Images/tank%20mini%20game.png)
 
 ---
 
@@ -207,11 +207,11 @@ dotnet run --project Shooter_Game0.1
 
 | Main Menu | Setup Screen |
 |---|---|
-| ![Main Menu](Images/main_menu.png) | ![Setup](Images/setup.png) |
+| ![Main Menu](Images/menu.png) | ![Setup](Images/setup.png) |
 
 | Gameplay | Leaderboard |
 |---|---|
-| ![Main Game](Images/main_game.png) | ![Leaderboard](Images/leaderboard.png) |
+| ![Main Game](Images/game%20map.png) | ![Leaderboard](Images/leaderboard.png) |
 
 ---
 
