@@ -3,7 +3,6 @@
 ![C#](https://img.shields.io/badge/C%23-12.0-239120?style=for-the-badge&logo=csharp&logoColor=white)
 ![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
 ![Windows Forms](https://img.shields.io/badge/Windows%20Forms-Desktop-0078D6?style=for-the-badge&logo=windows&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
 
 A **2D tactical grid shooter** built with Windows Forms, designed as a deep exploration of **Advanced OOP**, **Design Patterns**, and **LINQ** in C#. Every enemy type, weapon, and game mechanic is driven by polymorphism — not `if/else` chains.
 
@@ -227,6 +226,3 @@ dotnet run --project Shooter_Game0.1
 
 ---
 
-<p align="center">
-  <b>Dimitar Tashkov</b> — <a href="https://github.com/DimitarTashkov">GitHub</a>
-</p>
