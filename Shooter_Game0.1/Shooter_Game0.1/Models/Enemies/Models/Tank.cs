@@ -1,4 +1,3 @@
-// File: Models/Enemies/Models/Tank.cs
 using Shooter_Game0._1.Forms.MiniGames;
 using Shooter_Game0._1.Utilities;
 using Shooter_Game0._1.Utilities.Messages;
@@ -6,10 +5,7 @@ using System.Text;
 
 namespace Shooter_Game0._1.Models.Enemies.Models
 {
-    /// <summary>
-    /// Tank – the Armored. Mini-game: click shields in order (small → medium → large).
-    /// Phase 4 override: Tank can only rebirth on HARD difficulty.
-    /// </summary>
+
     public class Tank : Enemy
     {
         private const int EnemySizeInfo = 50;
@@ -18,7 +14,6 @@ namespace Shooter_Game0._1.Models.Enemies.Models
 
         public Tank() : base(EnemySizeInfo, EnemyHealthInfo) { }
 
-        // ── RegenHealth ────────────────────────────────────────────────────────
 
         public override string RegenHealth()
         {
@@ -37,24 +32,13 @@ namespace Shooter_Game0._1.Models.Enemies.Models
             return sb.ToString().Trim();
         }
 
-        // ── Phase 2: SpecialMove ───────────────────────────────────────────────
-
-        /// <summary>
-        /// Opens the Tank mini-game (click shields in order).
-        /// Returns true if all three shields are clicked in the correct sequence.
-        /// Returns false on wrong order or timeout.
-        /// </summary>
-        public override bool SpecialMove(Difficulty difficulty)
+        public override bool SpecialMove(Difficulty difficulty, string weaponType)
         {
-            using var form = new TankMiniGameForm(difficulty);
+            using var form = new TankMiniGameForm(difficulty, weaponType);
             return form.ShowDialog() == System.Windows.Forms.DialogResult.OK;
         }
 
-        // ── Phase 4: TryRebirth override ──────────────────────────────────────
 
-        /// <summary>
-        /// Tank is too powerful — can only rebirth on Hard difficulty.
-        /// </summary>
         public override bool TryRebirth(Difficulty difficulty)
         {
             if (difficulty != Difficulty.Hard)

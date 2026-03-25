@@ -16,18 +16,8 @@ namespace Shooter_Game0._1.Models.Enemies.Contracts
         public abstract string RegenHealth();
         public void RunCoordinates(IMap map, IEnemy enemy, Dictionary<Dictionary<int, int>, IEnemy> enemiesCoordinates);
 
-        /// <summary>
-        /// Polymorphic mini-game triggered on a successful hit (30% chance).
-        /// Returns true if the player wins the mini-game (damage is applied),
-        /// false if the player loses (penalty applied, no damage).
-        /// </summary>
-        public abstract bool SpecialMove(Difficulty difficulty);
+        public abstract bool SpecialMove(Difficulty difficulty, string weaponType);
 
-        /// <summary>
-        /// Attempts to revive the enemy after death.
-        /// Chance depends on difficulty: Easy=10%, Medium=25%, Hard=40%.
-        /// On success, life is restored to 25% of initial value and true is returned.
-        /// </summary>
         public abstract bool TryRebirth(Difficulty difficulty);
     }
 }

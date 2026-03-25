@@ -1,5 +1,3 @@
-// File: Models/Enemies/Models/Enemies.cs
-// NOTE: The abstract class was renamed from 'Enemies' to 'Enemy' (Phase 1).
 using Shooter_Game0._1.Core;
 using Shooter_Game0._1.Models.Enemies.Contracts;
 using Shooter_Game0._1.Models.Map.Contracts;
@@ -20,7 +18,6 @@ namespace Shooter_Game0._1.Models.Enemies.Models
         private bool isEnemyKilled;
         private double life;
 
-        // Stores the original life so TryRebirth can restore 25% of it (Phase 4)
         private readonly double initialLife;
 
         private static readonly Random _rng = new Random();
@@ -35,8 +32,6 @@ namespace Shooter_Game0._1.Models.Enemies.Models
             this.initialLife = this.life;
         }
 
-        // Validation is optional — stats are always valid by construction.
-        // Uncomment if stats are ever changed to potentially-invalid values.
 
         public int EnemySize
         {
@@ -80,27 +75,10 @@ namespace Shooter_Game0._1.Models.Enemies.Models
 
         public abstract string RegenHealth();
 
-        // ──────────────────────────────────────────────────────────────
-        //  Phase 2 – Polymorphic Mini-Game (SpecialMove)
-        // ──────────────────────────────────────────────────────────────
 
-        /// <summary>
-        /// Opens the enemy-specific mini-game form.
-        /// Returns true  → player won  → damage is applied.
-        /// Returns false → player lost → penalty is applied.
-        /// </summary>
-        public abstract bool SpecialMove(Difficulty difficulty);
+        public abstract bool SpecialMove(Difficulty difficulty, string weaponType);
 
-        // ──────────────────────────────────────────────────────────────
-        //  Phase 4 – Rebirth Mechanic
-        // ──────────────────────────────────────────────────────────────
 
-        /// <summary>
-        /// Called when an enemy's life reaches 0.
-        /// Rolls a chance based on difficulty: Easy 10%, Medium 25%, Hard 40%.
-        /// On success: restores life to 25% of initial value and returns true.
-        /// Override in Tank/Warrior to restrict rebirth to Hard only.
-        /// </summary>
         public virtual bool TryRebirth(Difficulty difficulty)
         {
             int chancePercent = difficulty switch

@@ -1,4 +1,3 @@
-// File: Models/Weapons/Models/Rifle.cs
 using Shooter_Game0._1.Utilities.Randomizer;
 using System;
 using System.Drawing;
@@ -18,16 +17,10 @@ namespace Shooter_Game0._1.Models.Weapons.Models
 
         public override bool IsHeadShot()
         {
-            // 20% chance for headshot
             return Randomizer.RifleHeadshotRandomizer() == HeadShotNumber;
         }
 
-        // ── Phase 5: Recoil ───────────────────────────────────────────────────
 
-        /// <summary>
-        /// Rifle recoil: randomly jitters the cursor to simulate rapid-fire kick-back.
-        /// Always returns true (shooting is not blocked; recoil is a side effect).
-        /// </summary>
         public override bool SpecialAction(Form gameForm)
         {
             var pos = Cursor.Position;
@@ -35,7 +28,6 @@ namespace Shooter_Game0._1.Models.Weapons.Models
             int shakeY = _rng.Next(-10, 11);
             Cursor.Position = new Point(pos.X + shakeX, pos.Y + shakeY);
 
-            // Show a brief "RECOIL!" indicator on the game form
             var recoilLabel = new Label
             {
                 Text = "⚡ RECOIL!",

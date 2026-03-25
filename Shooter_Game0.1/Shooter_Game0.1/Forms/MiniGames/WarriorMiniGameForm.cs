@@ -1,98 +1,46 @@
 // File: Forms/MiniGames/WarriorMiniGameForm.cs
-// Phase 2 – WARRIOR mini-game: "Hit the Berserker!"
-// A target shoots across the panel very fast. Click it within 3 seconds.
-// Hard mode: random blackout blink.
+using Shooter_Game0._1.Models.Weapons.Models;
+using Shooter_Game0._1.Utilities;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using Shooter_Game0._1.Utilities;
 
 namespace Shooter_Game0._1.Forms.MiniGames
 {
-    public class WarriorMiniGameForm : Form
+    public partial class WarriorMiniGameForm : Form
     {
         private readonly System.Windows.Forms.Timer _moveTimer;
         private readonly System.Windows.Forms.Timer _gameTimer;
         private readonly System.Windows.Forms.Timer _blinkTimer;
 
-        private readonly Panel _gamePanel;
-        private readonly Label _countdownLabel;
-        private readonly Panel _blinkOverlay;
-
         private Point _targetPos;
-        private int _velocityX;
-        private int _velocityY;
-        private const int TargetRadius = 24;
-        private int _timeRemainingMs = 3000;
-        private bool _blinkActive = false;
-        private readonly Random _rng = new Random();
+        private int   _velocityX;
+        private int   _velocityY;
+        private const int TargetRadius   = 24;
+        private int  _timeRemainingMs    = 3000;
+        private bool _blinkActive        = false;
+        private readonly Random _rng     = new Random();
+        private readonly string _weaponType;
 
-        public WarriorMiniGameForm(Difficulty difficulty)
+        public WarriorMiniGameForm(Difficulty difficulty, string weaponType)
         {
-            Text = "WARRIOR MINI-GAME: Hit the Berserker!";
-            Size = new Size(560, 340);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = false;
-            MinimizeBox = false;
-            StartPosition = FormStartPosition.CenterParent;
-            BackColor = Color.FromArgb(30, 8, 8);
+            InitializeComponent();
+            _weaponType = weaponType;
 
-            var instruction = new Label
+            if (difficulty == Difficulty.Hard)
             {
-                Text = difficulty == Difficulty.Hard
-                    ? "HARD MODE: Click the charging Warrior — fast and dark!"
-                    : "Click the charging Warrior before the timer runs out!",
-                ForeColor = difficulty == Difficulty.Hard ? Color.OrangeRed : Color.Tomato,
-                Font = new Font("Segoe UI", 9, FontStyle.Bold),
-                Location = new Point(10, 5),
-                Size = new Size(530, 22),
-                TextAlign = ContentAlignment.MiddleCenter
-            };
+                _instructionLabel.Text      = "HARD MODE: Click the charging Warrior — fast and dark!";
+                _instructionLabel.ForeColor = Color.OrangeRed;
+            }
 
-            _countdownLabel = new Label
-            {
-                Text = "Time: 3.0s",
-                ForeColor = Color.Yellow,
-                Font = new Font("Segoe UI", 13, FontStyle.Bold),
-                Location = new Point(215, 30),
-                Size = new Size(120, 26),
-                TextAlign = ContentAlignment.MiddleCenter
-            };
-
-            _gamePanel = new Panel
-            {
-                Location = new Point(10, 60),
-                Size = new Size(524, 230),
-                BackColor = Color.FromArgb(45, 15, 15),
-                BorderStyle = BorderStyle.FixedSingle
-            };
-            _gamePanel.Paint += GamePanel_Paint;
-            _gamePanel.MouseClick += GamePanel_MouseClick;
-
-            _blinkOverlay = new Panel
-            {
-                Location = _gamePanel.Location,
-                Size = _gamePanel.Size,
-                BackColor = Color.Black,
-                Visible = false
-            };
-
-            Controls.Add(instruction);
-            Controls.Add(_countdownLabel);
-            Controls.Add(_gamePanel);
-            Controls.Add(_blinkOverlay);
-            _blinkOverlay.BringToFront();
-
-            // Start target at random position, moving fast
             _targetPos = new Point(
-                _rng.Next(TargetRadius + 5, _gamePanel.Width - TargetRadius - 5),
+                _rng.Next(TargetRadius + 5, _gamePanel.Width  - TargetRadius - 5),
                 _rng.Next(TargetRadius + 5, _gamePanel.Height - TargetRadius - 5));
 
-            int speed = difficulty == Difficulty.Hard ? 9 : 7;
-            _velocityX = (_rng.Next(0, 2) == 0 ? 1 : -1) * speed;
-            _velocityY = (_rng.Next(0, 2) == 0 ? 1 : -1) * (speed - 2);
+            int speed  = difficulty == Difficulty.Hard ? 9 : 7;
+            _velocityX = (_rng.Next(2) == 0 ? 1 : -1) * speed;
+            _velocityY = (_rng.Next(2) == 0 ? 1 : -1) * (speed - 2);
 
-            // Movement timer – 16ms ≈ 60 fps
             _moveTimer = new System.Windows.Forms.Timer { Interval = 16 };
             _moveTimer.Tick += MoveTimer_Tick;
             _moveTimer.Start();
@@ -105,6 +53,30 @@ namespace Shooter_Game0._1.Forms.MiniGames
             _blinkTimer.Tick += BlinkTimer_Tick;
             if (difficulty == Difficulty.Hard)
                 _blinkTimer.Start();
+
+            Shown += (s, e) => ApplyWeaponEffect();
+        }
+
+        // ── Weapon effect ──────────────────────────────────────────────────────
+
+        private void ApplyWeaponEffect()
+        {
+            switch (_weaponType)
+            {
+                case "Rifle":
+                    new Rifle().SpecialAction(this);
+                    break;
+
+                case "Shotgun":
+                    bool cleared = new Shotgun().SpecialAction(this);
+                    if (!cleared)
+                        BeginInvoke(() => Resolve(won: false));
+                    break;
+
+                case "Sniper":
+                    new Sniper().SpecialAction(this);
+                    break;
+            }
         }
 
         // ── Paint ──────────────────────────────────────────────────────────────
@@ -115,10 +87,8 @@ namespace Shooter_Game0._1.Forms.MiniGames
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
             var rect = new Rectangle(
-                _targetPos.X - TargetRadius,
-                _targetPos.Y - TargetRadius,
-                TargetRadius * 2,
-                TargetRadius * 2);
+                _targetPos.X - TargetRadius, _targetPos.Y - TargetRadius,
+                TargetRadius * 2,            TargetRadius * 2);
 
             g.FillEllipse(new SolidBrush(Color.FromArgb(220, 20, 60)), rect);
             g.DrawEllipse(new Pen(Color.OrangeRed, 2), rect);
@@ -126,23 +96,22 @@ namespace Shooter_Game0._1.Forms.MiniGames
             using var font = new Font("Segoe UI", 13, FontStyle.Bold);
             var sz = g.MeasureString("W", font);
             g.DrawString("W", font, Brushes.White,
-                _targetPos.X - sz.Width / 2,
+                _targetPos.X - sz.Width  / 2,
                 _targetPos.Y - sz.Height / 2);
         }
 
-        // ── Interaction ────────────────────────────────────────────────────────
+        // ── Mouse click ────────────────────────────────────────────────────────
 
         private void GamePanel_MouseClick(object? sender, MouseEventArgs e)
         {
             if (_blinkActive) return;
-
             int dx = e.X - _targetPos.X;
             int dy = e.Y - _targetPos.Y;
             if (dx * dx + dy * dy <= TargetRadius * TargetRadius)
                 Resolve(won: true);
         }
 
-        // ── Timers ─────────────────────────────────────────────────────────────
+        // ── Timer callbacks ────────────────────────────────────────────────────
 
         private void MoveTimer_Tick(object? sender, EventArgs e)
         {
@@ -150,10 +119,8 @@ namespace Shooter_Game0._1.Forms.MiniGames
             _targetPos.Y += _velocityY;
 
             int margin = TargetRadius + 2;
-            if (_targetPos.X < margin || _targetPos.X > _gamePanel.Width - margin)
-                _velocityX = -_velocityX;
-            if (_targetPos.Y < margin || _targetPos.Y > _gamePanel.Height - margin)
-                _velocityY = -_velocityY;
+            if (_targetPos.X < margin || _targetPos.X > _gamePanel.Width  - margin) _velocityX = -_velocityX;
+            if (_targetPos.Y < margin || _targetPos.Y > _gamePanel.Height - margin) _velocityY = -_velocityY;
 
             _targetPos.X = Math.Clamp(_targetPos.X, margin, _gamePanel.Width  - margin);
             _targetPos.Y = Math.Clamp(_targetPos.Y, margin, _gamePanel.Height - margin);
@@ -192,18 +159,14 @@ namespace Shooter_Game0._1.Forms.MiniGames
 
         private void Resolve(bool won)
         {
-            _moveTimer.Stop();
-            _gameTimer.Stop();
-            _blinkTimer.Stop();
+            _moveTimer.Stop(); _gameTimer.Stop(); _blinkTimer.Stop();
             DialogResult = won ? DialogResult.OK : DialogResult.Cancel;
             Close();
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            _moveTimer.Stop();
-            _gameTimer.Stop();
-            _blinkTimer.Stop();
+            _moveTimer.Stop(); _gameTimer.Stop(); _blinkTimer.Stop();
             base.OnFormClosing(e);
         }
 
@@ -211,9 +174,10 @@ namespace Shooter_Game0._1.Forms.MiniGames
         {
             if (disposing)
             {
-                _moveTimer.Dispose();
-                _gameTimer.Dispose();
-                _blinkTimer.Dispose();
+                components?.Dispose();
+                _moveTimer?.Dispose();
+                _gameTimer?.Dispose();
+                _blinkTimer?.Dispose();
             }
             base.Dispose(disposing);
         }

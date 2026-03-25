@@ -1,4 +1,3 @@
-// File: Models/Enemies/Models/Warrior.cs
 using Shooter_Game0._1.Forms.MiniGames;
 using Shooter_Game0._1.Utilities;
 using Shooter_Game0._1.Utilities.Messages;
@@ -6,10 +5,7 @@ using System.Text;
 
 namespace Shooter_Game0._1.Models.Enemies.Models
 {
-    /// <summary>
-    /// Warrior – the Berserker. Mini-game: click the fast-moving target within 3 seconds.
-    /// Phase 4 override: Warrior can only rebirth on HARD difficulty.
-    /// </summary>
+
     public class Warrior : Enemy
     {
         private const int EnemySizeInfo = 30;
@@ -18,7 +14,6 @@ namespace Shooter_Game0._1.Models.Enemies.Models
 
         public Warrior() : base(EnemySizeInfo, EnemyHealthInfo) { }
 
-        // ── RegenHealth ────────────────────────────────────────────────────────
 
         public override string RegenHealth()
         {
@@ -37,24 +32,13 @@ namespace Shooter_Game0._1.Models.Enemies.Models
             return sb.ToString().Trim();
         }
 
-        // ── Phase 2: SpecialMove ───────────────────────────────────────────────
 
-        /// <summary>
-        /// Opens the Warrior mini-game (hit the fast-moving berserker).
-        /// Returns true if player clicked in time.
-        /// Returns false if time ran out.
-        /// </summary>
-        public override bool SpecialMove(Difficulty difficulty)
+        public override bool SpecialMove(Difficulty difficulty, string weaponType)
         {
-            using var form = new WarriorMiniGameForm(difficulty);
+            using var form = new WarriorMiniGameForm(difficulty, weaponType);
             return form.ShowDialog() == System.Windows.Forms.DialogResult.OK;
         }
 
-        // ── Phase 4: TryRebirth override ──────────────────────────────────────
-
-        /// <summary>
-        /// Warrior is too powerful — can only rebirth on Hard difficulty.
-        /// </summary>
         public override bool TryRebirth(Difficulty difficulty)
         {
             if (difficulty != Difficulty.Hard)

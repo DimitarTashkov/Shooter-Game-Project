@@ -1,108 +1,46 @@
 // File: Forms/MiniGames/TankMiniGameForm.cs
-// Phase 2 – TANK mini-game: "Break the Armor!"
-// 3 shields of different sizes appear. Player must click them smallest → largest.
-// Clicking wrong order = immediate fail. Hard mode: random blackout blink.
+using Shooter_Game0._1.Models.Weapons.Models;
+using Shooter_Game0._1.Utilities;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using Shooter_Game0._1.Utilities;
 
 namespace Shooter_Game0._1.Forms.MiniGames
 {
-    public class TankMiniGameForm : Form
+    public partial class TankMiniGameForm : Form
     {
         private readonly System.Windows.Forms.Timer _gameTimer;
         private readonly System.Windows.Forms.Timer _blinkTimer;
 
-        private readonly Panel _gamePanel;
-        private readonly Label _countdownLabel;
-        private readonly Label _stepLabel;
-        private readonly Panel _blinkOverlay;
-
-        // Shield data: 3 shields, sorted radii: [0]=small, [1]=medium, [2]=large
-        private static readonly int[] ShieldRadii   = { 22, 38, 56 };
-        private static readonly string[] ShieldNames = { "Small", "Medium", "Large" };
-        private readonly Point[] _shieldPositions = new Point[3];
-        private readonly bool[] _shieldClicked = new bool[3];
-
-        private int _currentStep = 0;   // which shield must be clicked next (0=small first)
-        private int _timeRemainingMs = 5000;
-        private bool _blinkActive = false;
-        private readonly Random _rng = new Random();
+        private static readonly int[]    ShieldRadii  = { 22, 38, 56 };
+        private static readonly string[] ShieldNames  = { "Small", "Medium", "Large" };
 
         private static readonly Color[] ShieldColors =
         {
-            Color.FromArgb(60, 180, 230),    // small  – light blue
-            Color.FromArgb(230, 160, 30),    // medium – gold
-            Color.FromArgb(180, 50,  50)     // large  – dark red
+            Color.FromArgb(60, 180, 230),
+            Color.FromArgb(230, 160, 30),
+            Color.FromArgb(180, 50,  50)
         };
 
-        public TankMiniGameForm(Difficulty difficulty)
+        private readonly Point[] _shieldPositions = new Point[3];
+        private readonly bool[]  _shieldClicked   = new bool[3];
+
+        private int  _currentStep     = 0;
+        private int  _timeRemainingMs = 5000;
+        private bool _blinkActive     = false;
+        private readonly Random _rng  = new Random();
+        private readonly string _weaponType;
+
+        public TankMiniGameForm(Difficulty difficulty, string weaponType)
         {
-            Text = "TANK MINI-GAME: Break the Armor!";
-            Size = new Size(500, 420);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = false;
-            MinimizeBox = false;
-            StartPosition = FormStartPosition.CenterParent;
-            BackColor = Color.FromArgb(18, 18, 28);
+            InitializeComponent();
+            _weaponType = weaponType;
 
-            var instruction = new Label
+            if (difficulty == Difficulty.Hard)
             {
-                Text = difficulty == Difficulty.Hard
-                    ? "HARD MODE: Click shields  Small → Medium → Large! Blackouts active!"
-                    : "Click the shields in order:  Small → Medium → Large!",
-                ForeColor = difficulty == Difficulty.Hard ? Color.OrangeRed : Color.SteelBlue,
-                Font = new Font("Segoe UI", 9, FontStyle.Bold),
-                Location = new Point(10, 5),
-                Size = new Size(470, 22),
-                TextAlign = ContentAlignment.MiddleCenter
-            };
-
-            _countdownLabel = new Label
-            {
-                Text = "Time: 5.0s",
-                ForeColor = Color.Yellow,
-                Font = new Font("Segoe UI", 13, FontStyle.Bold),
-                Location = new Point(190, 30),
-                Size = new Size(120, 26),
-                TextAlign = ContentAlignment.MiddleCenter
-            };
-
-            _stepLabel = new Label
-            {
-                Text = "Step 1 of 3: Click the SMALL (blue) shield",
-                ForeColor = Color.LightCyan,
-                Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(10, 58),
-                Size = new Size(470, 20),
-                TextAlign = ContentAlignment.MiddleCenter
-            };
-
-            _gamePanel = new Panel
-            {
-                Location = new Point(10, 82),
-                Size = new Size(464, 290),
-                BackColor = Color.FromArgb(28, 28, 40),
-                BorderStyle = BorderStyle.FixedSingle
-            };
-            _gamePanel.Paint += GamePanel_Paint;
-            _gamePanel.MouseClick += GamePanel_MouseClick;
-
-            _blinkOverlay = new Panel
-            {
-                Location = _gamePanel.Location,
-                Size = _gamePanel.Size,
-                BackColor = Color.Black,
-                Visible = false
-            };
-
-            Controls.Add(instruction);
-            Controls.Add(_countdownLabel);
-            Controls.Add(_stepLabel);
-            Controls.Add(_gamePanel);
-            Controls.Add(_blinkOverlay);
-            _blinkOverlay.BringToFront();
+                _instructionLabel.Text      = "HARD MODE: Click shields  Small \u2192 Medium \u2192 Large! Blackouts active!";
+                _instructionLabel.ForeColor = Color.OrangeRed;
+            }
 
             PlaceShields();
 
@@ -114,14 +52,36 @@ namespace Shooter_Game0._1.Forms.MiniGames
             _blinkTimer.Tick += BlinkTimer_Tick;
             if (difficulty == Difficulty.Hard)
                 _blinkTimer.Start();
+
+            Shown += (s, e) => ApplyWeaponEffect();
+        }
+
+        // ── Weapon effect ──────────────────────────────────────────────────────
+
+        private void ApplyWeaponEffect()
+        {
+            switch (_weaponType)
+            {
+                case "Rifle":
+                    new Rifle().SpecialAction(this);
+                    break;
+
+                case "Shotgun":
+                    bool cleared = new Shotgun().SpecialAction(this);
+                    if (!cleared)
+                        BeginInvoke(() => Resolve(won: false));
+                    break;
+
+                case "Sniper":
+                    new Sniper().SpecialAction(this);
+                    break;
+            }
         }
 
         // ── Shield placement ───────────────────────────────────────────────────
 
         private void PlaceShields()
         {
-            // Divide the panel into 3 horizontal zones, place each shield in one zone.
-            // Shuffle which zone gets which shield so the layout isn't always identical.
             int[] zones = { 0, 1, 2 };
             for (int i = 2; i > 0; i--)
             {
@@ -132,8 +92,8 @@ namespace Shooter_Game0._1.Forms.MiniGames
             int zoneW = _gamePanel.Width / 3;
             for (int i = 0; i < 3; i++)
             {
+                int r    = ShieldRadii[i];
                 int zone = zones[i];
-                int r = ShieldRadii[i];
                 int xMin = zone * zoneW + r + 8;
                 int xMax = (zone + 1) * zoneW - r - 8;
                 int yMin = r + 8;
@@ -153,29 +113,29 @@ namespace Shooter_Game0._1.Forms.MiniGames
 
             for (int i = 0; i < 3; i++)
             {
-                if (_shieldClicked[i]) continue; // already destroyed
+                if (_shieldClicked[i]) continue;
 
-                int r = ShieldRadii[i];
-                var rect = new Rectangle(_shieldPositions[i].X - r, _shieldPositions[i].Y - r, r * 2, r * 2);
-
-                // Glow for the "currently expected" shield
+                int  r      = ShieldRadii[i];
                 bool isNext = (i == _currentStep);
+                var  rect   = new Rectangle(_shieldPositions[i].X - r, _shieldPositions[i].Y - r, r * 2, r * 2);
+
                 using var fill = new SolidBrush(ShieldColors[i]);
                 g.FillEllipse(fill, rect);
 
-                using var borderPen = new Pen(isNext ? Color.White : Color.FromArgb(100, 100, 100), isNext ? 3 : 1);
-                g.DrawEllipse(borderPen, rect);
+                using var pen = new Pen(isNext ? Color.White : Color.FromArgb(100, 100, 100), isNext ? 3 : 1);
+                g.DrawEllipse(pen, rect);
 
+                string lbl = ShieldNames[i][0].ToString();
                 using var font = new Font("Segoe UI", Math.Max(r / 2.5f, 8), FontStyle.Bold);
-                string lbl = ShieldNames[i][0].ToString(); // S, M, L
                 var sz = g.MeasureString(lbl, font);
-                g.DrawString(lbl, font, isNext ? Brushes.White : Brushes.DimGray,
-                    _shieldPositions[i].X - sz.Width / 2,
+                g.DrawString(lbl, font,
+                    isNext ? Brushes.White : Brushes.DimGray,
+                    _shieldPositions[i].X - sz.Width  / 2,
                     _shieldPositions[i].Y - sz.Height / 2);
             }
         }
 
-        // ── Interaction ────────────────────────────────────────────────────────
+        // ── Mouse click ────────────────────────────────────────────────────────
 
         private void GamePanel_MouseClick(object? sender, MouseEventArgs e)
         {
@@ -185,36 +145,27 @@ namespace Shooter_Game0._1.Forms.MiniGames
             {
                 if (_shieldClicked[i]) continue;
 
-                int r = ShieldRadii[i];
+                int r  = ShieldRadii[i];
                 int dx = e.X - _shieldPositions[i].X;
                 int dy = e.Y - _shieldPositions[i].Y;
 
                 if (dx * dx + dy * dy <= r * r)
                 {
-                    if (i != _currentStep)
-                    {
-                        // Wrong order → lose
-                        Resolve(won: false);
-                        return;
-                    }
+                    if (i != _currentStep) { Resolve(won: false); return; }
 
                     _shieldClicked[i] = true;
                     _currentStep++;
                     _gamePanel.Invalidate();
 
-                    if (_currentStep >= 3)
-                    {
-                        Resolve(won: true);
-                        return;
-                    }
+                    if (_currentStep >= 3) { Resolve(won: true); return; }
 
-                    UpdateStepLabel();
+                    _stepLabel.Text = $"Step {_currentStep + 1} of 3: Click the {ShieldNames[_currentStep].ToUpper()} shield";
                     return;
                 }
             }
         }
 
-        // ── Timers ─────────────────────────────────────────────────────────────
+        // ── Timer callbacks ────────────────────────────────────────────────────
 
         private void GameTimer_Tick(object? sender, EventArgs e)
         {
@@ -243,26 +194,18 @@ namespace Shooter_Game0._1.Forms.MiniGames
             restore.Start();
         }
 
-        // ── Helpers ────────────────────────────────────────────────────────────
-
-        private void UpdateStepLabel()
-        {
-            if (_currentStep < 3)
-                _stepLabel.Text = $"Step {_currentStep + 1} of 3: Click the {ShieldNames[_currentStep].ToUpper()} shield";
-        }
+        // ── Resolution ─────────────────────────────────────────────────────────
 
         private void Resolve(bool won)
         {
-            _gameTimer.Stop();
-            _blinkTimer.Stop();
+            _gameTimer.Stop(); _blinkTimer.Stop();
             DialogResult = won ? DialogResult.OK : DialogResult.Cancel;
             Close();
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            _gameTimer.Stop();
-            _blinkTimer.Stop();
+            _gameTimer.Stop(); _blinkTimer.Stop();
             base.OnFormClosing(e);
         }
 
@@ -270,8 +213,9 @@ namespace Shooter_Game0._1.Forms.MiniGames
         {
             if (disposing)
             {
-                _gameTimer.Dispose();
-                _blinkTimer.Dispose();
+                components?.Dispose();
+                _gameTimer?.Dispose();
+                _blinkTimer?.Dispose();
             }
             base.Dispose(disposing);
         }

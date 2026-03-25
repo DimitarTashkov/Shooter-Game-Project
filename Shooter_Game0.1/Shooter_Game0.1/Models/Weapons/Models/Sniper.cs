@@ -1,4 +1,3 @@
-// File: Models/Weapons/Models/Sniper.cs
 using Shooter_Game0._1.Utilities.Randomizer;
 using System;
 using System.Drawing;
@@ -20,17 +19,9 @@ namespace Shooter_Game0._1.Models.Weapons.Models
             return Randomizer.SniperHeadshotRandomizer() == HeadShotNumber;
         }
 
-        // ── Phase 5: Hold Breath ──────────────────────────────────────────────
 
-        /// <summary>
-        /// Sniper hold-breath: displays a "HOLDING BREATH – AIM STEADY" overlay
-        /// on the game form for 2 seconds, then signals that the next shot has a
-        /// +50% accuracy bonus (communicated via a label in the game form UI).
-        /// Returns true (shooting is not blocked; hold-breath enhances the next shot).
-        /// </summary>
         public override bool SpecialAction(Form gameForm)
         {
-            // Remove any existing overlay first
             foreach (Control c in gameForm.Controls)
             {
                 if (c.Tag is string t && t == "SniperBreath")

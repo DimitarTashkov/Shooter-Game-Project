@@ -1,4 +1,3 @@
-// File: Models/Weapons/Models/Weapons.cs
 using Shooter_Game0._1.Models.Weapons.Contracts;
 using Shooter_Game0._1.Utilities.Messages;
 using System;

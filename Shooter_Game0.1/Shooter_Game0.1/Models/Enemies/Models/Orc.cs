@@ -1,4 +1,3 @@
-// File: Models/Enemies/Models/Orc.cs
 using Shooter_Game0._1.Forms.MiniGames;
 using Shooter_Game0._1.Utilities;
 using Shooter_Game0._1.Utilities.Messages;
@@ -6,10 +5,7 @@ using System.Text;
 
 namespace Shooter_Game0._1.Models.Enemies.Models
 {
-    /// <summary>
-    /// Orc – the Thief. Mini-game: click the moving target within 3 seconds.
-    /// Rebirth uses base logic (all difficulties eligible).
-    /// </summary>
+
     public class Orc : Enemy
     {
         private const int EnemySizeInfo = 15;
@@ -18,7 +14,6 @@ namespace Shooter_Game0._1.Models.Enemies.Models
 
         public Orc() : base(EnemySizeInfo, EnemyHealthInfo) { }
 
-        // ── RegenHealth ────────────────────────────────────────────────────────
 
         public override string RegenHealth()
         {
@@ -37,16 +32,10 @@ namespace Shooter_Game0._1.Models.Enemies.Models
             return sb.ToString().Trim();
         }
 
-        // ── Phase 2: SpecialMove ───────────────────────────────────────────────
 
-        /// <summary>
-        /// Opens the Orc mini-game (catch the moving thief).
-        /// Returns true if the player clicked the target in time (damage is applied).
-        /// Returns false if time ran out (Orc steals points).
-        /// </summary>
-        public override bool SpecialMove(Difficulty difficulty)
+        public override bool SpecialMove(Difficulty difficulty, string weaponType)
         {
-            using var form = new OrcMiniGameForm(difficulty);
+            using var form = new OrcMiniGameForm(difficulty, weaponType);
             return form.ShowDialog() == System.Windows.Forms.DialogResult.OK;
         }
     }

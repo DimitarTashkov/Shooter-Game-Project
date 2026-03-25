@@ -1,0 +1,79 @@
+// File: Forms/MiniGames/WarriorMiniGameForm.Designer.cs
+namespace Shooter_Game0._1.Forms.MiniGames
+{
+    partial class WarriorMiniGameForm
+    {
+        private System.ComponentModel.IContainer components = null;
+
+        private Label _instructionLabel;
+        private Label _countdownLabel;
+        private Panel _gamePanel;
+        private Panel _blinkOverlay;
+
+        private void InitializeComponent()
+        {
+            _instructionLabel = new Label();
+            _countdownLabel   = new Label();
+            _gamePanel        = new Panel();
+            _blinkOverlay     = new Panel();
+            SuspendLayout();
+            //
+            // _instructionLabel
+            //
+            _instructionLabel.Font      = new Font("Segoe UI", 9F, FontStyle.Bold);
+            _instructionLabel.ForeColor = Color.Tomato;
+            _instructionLabel.Location  = new Point(10, 5);
+            _instructionLabel.Name      = "_instructionLabel";
+            _instructionLabel.Size      = new Size(530, 22);
+            _instructionLabel.Text      = "Click the charging Warrior before the timer runs out!";
+            _instructionLabel.TextAlign = ContentAlignment.MiddleCenter;
+            //
+            // _countdownLabel
+            //
+            _countdownLabel.Font      = new Font("Segoe UI", 13F, FontStyle.Bold);
+            _countdownLabel.ForeColor = Color.Yellow;
+            _countdownLabel.Location  = new Point(215, 30);
+            _countdownLabel.Name      = "_countdownLabel";
+            _countdownLabel.Size      = new Size(120, 26);
+            _countdownLabel.Text      = "Time: 3.0s";
+            _countdownLabel.TextAlign = ContentAlignment.MiddleCenter;
+            //
+            // _gamePanel
+            //
+            _gamePanel.BackColor  = Color.FromArgb(45, 15, 15);
+            _gamePanel.BorderStyle = BorderStyle.FixedSingle;
+            _gamePanel.Location   = new Point(10, 60);
+            _gamePanel.Name       = "_gamePanel";
+            _gamePanel.Size       = new Size(524, 230);
+            _gamePanel.Paint      += GamePanel_Paint;
+            _gamePanel.MouseClick += GamePanel_MouseClick;
+            //
+            // _blinkOverlay
+            //
+            _blinkOverlay.BackColor = Color.Black;
+            _blinkOverlay.Location  = new Point(10, 60);
+            _blinkOverlay.Name      = "_blinkOverlay";
+            _blinkOverlay.Size      = new Size(524, 230);
+            _blinkOverlay.Visible   = false;
+            //
+            // WarriorMiniGameForm
+            //
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode       = AutoScaleMode.Font;
+            BackColor           = Color.FromArgb(30, 8, 8);
+            ClientSize          = new Size(560, 340);
+            Controls.Add(_instructionLabel);
+            Controls.Add(_countdownLabel);
+            Controls.Add(_gamePanel);
+            Controls.Add(_blinkOverlay);
+            _blinkOverlay.BringToFront();
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            MaximizeBox     = false;
+            MinimizeBox     = false;
+            Name            = "WarriorMiniGameForm";
+            StartPosition   = FormStartPosition.CenterParent;
+            Text            = "WARRIOR MINI-GAME: Hit the Berserker!";
+            ResumeLayout(false);
+        }
+    }
+}

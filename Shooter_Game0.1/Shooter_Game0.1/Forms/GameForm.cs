@@ -8,7 +8,6 @@ using Shooter_Game0._1.Utilities;
 using Shooter_Game0._1.Utilities.Randomizer;
 using Shooter_Game0._1.Models.SaveData;
 using Shooter_Game0._1.Models.Maps;
-using Shooter_Game0._1.Models.Weapons.Models;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -31,11 +30,6 @@ namespace Shooter_Game0._1.Forms
         private readonly Stack<(int row, int col)> moveHistory = new();
         private readonly Random _rng = new Random();
 
-        // Phase 5 – Rifle recoil: track shot count
-        private int _rifleShots = 0;
-
-        // Phase 5 – Sniper hold-breath: next shot gets accuracy bonus flag
-        private bool _sniperBreathActive = false;
 
         private int CellWidth  => mapPanel.Width  / Math.Max(map.Y, 1);
         private int CellHeight => mapPanel.Height / Math.Max(map.X, 1);
@@ -63,7 +57,7 @@ namespace Shooter_Game0._1.Forms
             LogMessage($"Equipped weapon: {weaponType}");
             LogMessage($"Difficulty: {difficulty}");
             LogMessage(result);
-            LogMessage("Click a cell or WASD + Space to shoot.  Right-click = Sniper hold-breath.");
+            LogMessage("Click a cell or WASD + Space to shoot.");
             LogMessage("Press H for hint, R for stats, Ctrl+Z to undo.");
 
             IUser user = controller.GetOrCreateUser(username);
@@ -197,14 +191,6 @@ namespace Shooter_Game0._1.Forms
 
             if (e.Button == MouseButtons.Right)
             {
-                // Phase 5 – Sniper hold-breath on right-click
-                if (weaponType == "Sniper")
-                {
-                    var sniper = new Sniper();
-                    sniper.SpecialAction(this);
-                    _sniperBreathActive = true;
-                    LogMessage("[SNIPER] Holding breath — next shot deals bonus damage!");
-                }
                 mapPanel.Invalidate();
                 return;
             }
@@ -280,10 +266,9 @@ namespace Shooter_Game0._1.Forms
 
         /// <summary>
         /// Core shoot method integrating:
-        /// - Phase 5: weapon SpecialAction (pre-shot checks)
         /// - Phase 2: enemy SpecialMove (30% mini-game trigger on hit)
         /// - Phase 4: TryRebirth (handled inside ShootCommand)
-        /// </summary>
+        ///</summary>
         private void ShootAt(int row, int col)
         {
             if (controller.EnemiesCoordinates.Count == 0)
@@ -292,16 +277,12 @@ namespace Shooter_Game0._1.Forms
                 return;
             }
 
-            // ── Phase 5: Weapon SpecialAction (pre-shot) ──────────────────────
-            if (!HandleWeaponSpecialAction())
-                return; // shot was blocked (e.g. shotgun jam not cleared)
-
             // ── Phase 2: Check if enemy is at this cell → maybe trigger mini-game ──
             IEnemy? enemy = GetEnemyAt(row, col);
             if (enemy != null && ShouldTriggerSpecialMove())
             {
                 LogMessage($"[MINI-GAME] {enemy.GetType().Name} triggers special move!");
-                bool playerWon = enemy.SpecialMove(difficulty);
+                bool playerWon = enemy.SpecialMove(difficulty, weaponType);
 
                 if (playerWon)
                 {
@@ -320,52 +301,12 @@ namespace Shooter_Game0._1.Forms
             // ── Normal shot ───────────────────────────────────────────────────
             moveHistory.Push((row, col));
 
-            // Apply sniper breath bonus to damage (conceptual — bonus already shown to user)
-            if (_sniperBreathActive && weaponType == "Sniper")
-            {
-                LogMessage("[SNIPER] Hold-breath bonus active on this shot!");
-                _sniperBreathActive = false;
-            }
-
             string result = controller.Shoot(row, col, username, difficulty);
             LogMessage(result);
             UpdateEnemiesLeft();
 
-            // Phase 5 – Rifle recoil on every 3rd shot
-            if (weaponType == "Rifle")
-            {
-                _rifleShots++;
-                if (_rifleShots % 3 == 0)
-                {
-                    var rifle = new Rifle();
-                    rifle.SpecialAction(this);
-                    LogMessage("[RIFLE] Recoil kick — aim shifts!");
-                }
-            }
-
             if (controller.EnemiesCoordinates.Count == 0)
                 LogMessage("*** ALL ENEMIES ELIMINATED! ***");
-        }
-
-        /// <summary>
-        /// Handles pre-shot weapon special actions.
-        /// Returns false if the shot should be blocked.
-        /// </summary>
-        private bool HandleWeaponSpecialAction()
-        {
-            // Shotgun: 20% chance of jamming before the shot
-            if (weaponType == "Shotgun" && _rng.Next(1, 6) == 1) // 20%
-            {
-                var shotgun = new Shotgun();
-                bool cleared = shotgun.SpecialAction(this);
-                if (!cleared)
-                {
-                    LogMessage("[SHOTGUN] Weapon jammed! Turn lost — jam not cleared.");
-                    return false;
-                }
-                LogMessage("[SHOTGUN] Jam cleared — firing!");
-            }
-            return true;
         }
 
         /// <summary>Returns enemy at (row, col) or null if cell is empty.</summary>

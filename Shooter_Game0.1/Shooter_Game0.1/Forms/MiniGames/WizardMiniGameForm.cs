@@ -1,102 +1,39 @@
 // File: Forms/MiniGames/WizardMiniGameForm.cs
-// Phase 2 – WIZARD mini-game: "Find the Real Wizard!"
-// 3 targets: 1 real Wizard (purple, larger), 2 clones (grey, smaller).
-// Player must click the real one. Wrong click = instant lose.
-// Hard mode: random blackout blink.
+using Shooter_Game0._1.Models.Weapons.Models;
+using Shooter_Game0._1.Utilities;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using Shooter_Game0._1.Utilities;
 
 namespace Shooter_Game0._1.Forms.MiniGames
 {
-    public class WizardMiniGameForm : Form
+    public partial class WizardMiniGameForm : Form
     {
         private readonly System.Windows.Forms.Timer _gameTimer;
         private readonly System.Windows.Forms.Timer _blinkTimer;
 
-        private readonly Panel _gamePanel;
-        private readonly Label _countdownLabel;
-        private readonly Panel _blinkOverlay;
-
-        // Target data: position + radius for each of the 3 targets
         private readonly Point[] _positions = new Point[3];
-        private readonly int[] _radii = new int[] { 30, 20, 20 }; // index 0 = real (larger)
-        private int _realIndex;                                     // shuffled into [0,1,2]
-        private int _timeRemainingMs = 8000;
-        private bool _blinkActive = false;
-        private readonly Random _rng = new Random();
+        private readonly int[]   _radii     = new int[3];
+        private int  _realIndex;
+        private int  _timeRemainingMs    = 8000;
+        private bool _blinkActive        = false;
+        private readonly Random _rng     = new Random();
+        private readonly string _weaponType;
 
         private static readonly Color ColReal   = Color.FromArgb(148, 103, 189);
         private static readonly Color ColClone  = Color.FromArgb(80,  80,  80);
         private static readonly Color ColBorder = Color.FromArgb(200, 160, 255);
 
-        public WizardMiniGameForm(Difficulty difficulty)
+        public WizardMiniGameForm(Difficulty difficulty, string weaponType)
         {
-            Text = "WIZARD MINI-GAME: Find the Real Wizard!";
-            Size = new Size(500, 420);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = false;
-            MinimizeBox = false;
-            StartPosition = FormStartPosition.CenterParent;
-            BackColor = Color.FromArgb(20, 10, 30);
+            InitializeComponent();
+            _weaponType = weaponType;
 
-            var instruction = new Label
+            if (difficulty == Difficulty.Hard)
             {
-                Text = difficulty == Difficulty.Hard
-                    ? "HARD MODE: Click the REAL Wizard — one chance, watch for blackouts!"
-                    : "Click the REAL Wizard (one of the three targets)!",
-                ForeColor = difficulty == Difficulty.Hard ? Color.OrangeRed : Color.MediumPurple,
-                Font = new Font("Segoe UI", 9, FontStyle.Bold),
-                Location = new Point(10, 5),
-                Size = new Size(470, 22),
-                TextAlign = ContentAlignment.MiddleCenter
-            };
-
-            _countdownLabel = new Label
-            {
-                Text = "Time: 8.0s",
-                ForeColor = Color.Yellow,
-                Font = new Font("Segoe UI", 13, FontStyle.Bold),
-                Location = new Point(190, 30),
-                Size = new Size(120, 26),
-                TextAlign = ContentAlignment.MiddleCenter
-            };
-
-            var legendLabel = new Label
-            {
-                Text = "Hint: The real one is LARGER and PURPLE!",
-                ForeColor = Color.FromArgb(200, 160, 255),
-                Font = new Font("Segoe UI", 9, FontStyle.Italic),
-                Location = new Point(10, 58),
-                Size = new Size(470, 18),
-                TextAlign = ContentAlignment.MiddleCenter
-            };
-
-            _gamePanel = new Panel
-            {
-                Location = new Point(10, 80),
-                Size = new Size(464, 290),
-                BackColor = Color.FromArgb(28, 15, 40),
-                BorderStyle = BorderStyle.FixedSingle
-            };
-            _gamePanel.Paint += GamePanel_Paint;
-            _gamePanel.MouseClick += GamePanel_MouseClick;
-
-            _blinkOverlay = new Panel
-            {
-                Location = _gamePanel.Location,
-                Size = _gamePanel.Size,
-                BackColor = Color.Black,
-                Visible = false
-            };
-
-            Controls.Add(instruction);
-            Controls.Add(_countdownLabel);
-            Controls.Add(legendLabel);
-            Controls.Add(_gamePanel);
-            Controls.Add(_blinkOverlay);
-            _blinkOverlay.BringToFront();
+                _instructionLabel.Text      = "HARD MODE: Click the REAL Wizard — one chance, watch for blackouts!";
+                _instructionLabel.ForeColor = Color.OrangeRed;
+            }
 
             PlaceTargets();
 
@@ -108,33 +45,54 @@ namespace Shooter_Game0._1.Forms.MiniGames
             _blinkTimer.Tick += BlinkTimer_Tick;
             if (difficulty == Difficulty.Hard)
                 _blinkTimer.Start();
+
+            Shown += (s, e) => ApplyWeaponEffect();
+        }
+
+        // ── Weapon effect ──────────────────────────────────────────────────────
+
+        private void ApplyWeaponEffect()
+        {
+            switch (_weaponType)
+            {
+                case "Rifle":
+                    new Rifle().SpecialAction(this);
+                    break;
+
+                case "Shotgun":
+                    bool cleared = new Shotgun().SpecialAction(this);
+                    if (!cleared)
+                        BeginInvoke(() => Resolve(won: false));
+                    break;
+
+                case "Sniper":
+                    new Sniper().SpecialAction(this);
+                    break;
+            }
         }
 
         // ── Target placement ───────────────────────────────────────────────────
 
         private void PlaceTargets()
         {
-            // Assign radii: one slot gets the larger radius (real), two get smaller (clones).
-            // Shuffle which slot is "real".
-            int[] shuffled = { 0, 1, 2 };
+            int[] zones = { 0, 1, 2 };
             for (int i = 2; i > 0; i--)
             {
                 int j = _rng.Next(i + 1);
-                (shuffled[i], shuffled[j]) = (shuffled[j], shuffled[i]);
+                (zones[i], zones[j]) = (zones[j], zones[i]);
             }
-            _realIndex = shuffled[0];
+            _realIndex = zones[0];
 
-            // Re-assign radii so the real target is always the biggest
             for (int i = 0; i < 3; i++)
                 _radii[i] = (i == _realIndex) ? 30 : 18;
 
-            // Place in three non-overlapping zones
             int zoneW = _gamePanel.Width / 3;
             for (int i = 0; i < 3; i++)
             {
-                int r = _radii[i];
-                int xMin = i * zoneW + r + 10;
-                int xMax = (i + 1) * zoneW - r - 10;
+                int r    = _radii[i];
+                int zone = zones[i];
+                int xMin = zone * zoneW + r + 10;
+                int xMax = (zone + 1) * zoneW - r - 10;
                 int yMin = r + 10;
                 int yMax = _gamePanel.Height - r - 10;
                 _positions[i] = new Point(
@@ -155,9 +113,9 @@ namespace Shooter_Game0._1.Forms.MiniGames
 
             for (int i = 0; i < 3; i++)
             {
-                int r = _radii[i];
-                var rect = new Rectangle(_positions[i].X - r, _positions[i].Y - r, r * 2, r * 2);
+                int  r      = _radii[i];
                 bool isReal = (i == _realIndex);
+                var  rect   = new Rectangle(_positions[i].X - r, _positions[i].Y - r, r * 2, r * 2);
 
                 using var fill = new SolidBrush(isReal ? ColReal : ColClone);
                 g.FillEllipse(fill, rect);
@@ -167,20 +125,19 @@ namespace Shooter_Game0._1.Forms.MiniGames
                 using var font = new Font("Segoe UI", r / 1.8f, FontStyle.Bold);
                 var sz = g.MeasureString(lbl, font);
                 g.DrawString(lbl, font, Brushes.White,
-                    _positions[i].X - sz.Width / 2,
+                    _positions[i].X - sz.Width  / 2,
                     _positions[i].Y - sz.Height / 2);
             }
         }
 
-        // ── Interaction ────────────────────────────────────────────────────────
+        // ── Mouse click ────────────────────────────────────────────────────────
 
         private void GamePanel_MouseClick(object? sender, MouseEventArgs e)
         {
             if (_blinkActive) return;
-
             for (int i = 0; i < 3; i++)
             {
-                int r = _radii[i];
+                int r  = _radii[i];
                 int dx = e.X - _positions[i].X;
                 int dy = e.Y - _positions[i].Y;
                 if (dx * dx + dy * dy <= r * r)
@@ -191,7 +148,7 @@ namespace Shooter_Game0._1.Forms.MiniGames
             }
         }
 
-        // ── Timers ─────────────────────────────────────────────────────────────
+        // ── Timer callbacks ────────────────────────────────────────────────────
 
         private void GameTimer_Tick(object? sender, EventArgs e)
         {
@@ -224,16 +181,14 @@ namespace Shooter_Game0._1.Forms.MiniGames
 
         private void Resolve(bool won)
         {
-            _gameTimer.Stop();
-            _blinkTimer.Stop();
+            _gameTimer.Stop(); _blinkTimer.Stop();
             DialogResult = won ? DialogResult.OK : DialogResult.Cancel;
             Close();
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            _gameTimer.Stop();
-            _blinkTimer.Stop();
+            _gameTimer.Stop(); _blinkTimer.Stop();
             base.OnFormClosing(e);
         }
 
@@ -241,8 +196,9 @@ namespace Shooter_Game0._1.Forms.MiniGames
         {
             if (disposing)
             {
-                _gameTimer.Dispose();
-                _blinkTimer.Dispose();
+                components?.Dispose();
+                _gameTimer?.Dispose();
+                _blinkTimer?.Dispose();
             }
             base.Dispose(disposing);
         }

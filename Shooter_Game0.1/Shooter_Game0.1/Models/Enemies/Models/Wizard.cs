@@ -1,4 +1,3 @@
-// File: Models/Enemies/Models/Wizard.cs
 using Shooter_Game0._1.Forms.MiniGames;
 using Shooter_Game0._1.Utilities;
 using Shooter_Game0._1.Utilities.Messages;
@@ -6,10 +5,7 @@ using System.Text;
 
 namespace Shooter_Game0._1.Models.Enemies.Models
 {
-    /// <summary>
-    /// Wizard – the Illusionist. Mini-game: choose the real Wizard among 3 targets.
-    /// Rebirth uses base logic (all difficulties eligible).
-    /// </summary>
+
     public class Wizard : Enemy
     {
         private const int EnemySizeInfo = 25;
@@ -18,7 +14,6 @@ namespace Shooter_Game0._1.Models.Enemies.Models
 
         public Wizard() : base(EnemySizeInfo, EnemyHealthInfo) { }
 
-        // ── RegenHealth ────────────────────────────────────────────────────────
 
         public override string RegenHealth()
         {
@@ -37,16 +32,10 @@ namespace Shooter_Game0._1.Models.Enemies.Models
             return sb.ToString().Trim();
         }
 
-        // ── Phase 2: SpecialMove ───────────────────────────────────────────────
 
-        /// <summary>
-        /// Opens the Wizard mini-game (find the real wizard).
-        /// Returns true if correct target chosen (damage applied).
-        /// Returns false if wrong target or time expired (penalty applied).
-        /// </summary>
-        public override bool SpecialMove(Difficulty difficulty)
+        public override bool SpecialMove(Difficulty difficulty, string weaponType)
         {
-            using var form = new WizardMiniGameForm(difficulty);
+            using var form = new WizardMiniGameForm(difficulty, weaponType);
             return form.ShowDialog() == System.Windows.Forms.DialogResult.OK;
         }
     }
