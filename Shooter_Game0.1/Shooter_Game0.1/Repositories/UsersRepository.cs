@@ -37,46 +37,62 @@ namespace Shooter_Game0._1.Repositories
             return true;
         }
 
+        public void UpdateModel(IUser model)
+        {
+            int index = users.FindIndex(u => u.Username == model.Username);
+            if (index >= 0)
+                users[index] = model;
+            else
+                users.Add(model);
+
+            SaveUsers();
+        }
+
         // ── Persistence ───────────────────────────────────────────────────────
 
         private void SaveUsers()
         {
-            var records = users
-                .OfType<User>()
-                .Select(u => new UserRecord(u.Username, u.EnemiesKilled, u.DamageDealt, u.Points))
-                .ToList();
+            var dtos = users.Select(u => new UserDTO
+            {
+                Username      = u.Username,
+                EnemiesKilled = u.EnemiesKilled,
+                DamageDealt   = u.DamageDealt,
+                Points        = u.Points
+            }).ToList();
 
-            string json = JsonSerializer.Serialize(records, new JsonSerializerOptions { WriteIndented = true });
+            string json = JsonSerializer.Serialize(dtos, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(FilePath, json);
         }
 
-        private static List<IUser> LoadUsers()
+        private List<IUser> LoadUsers()
         {
             if (!File.Exists(FilePath))
                 return new List<IUser>();
 
             string json = File.ReadAllText(FilePath);
-            var records = JsonSerializer.Deserialize<List<UserRecord>>(json);
-            if (records == null) return new List<IUser>();
+            var dtos = JsonSerializer.Deserialize<List<UserDTO>>(json);
+            if (dtos == null) return new List<IUser>();
 
-            return records.Select(r =>
+            return dtos.Select(dto =>
             {
-                var u = new User(r.Username)
+                var user = new User(dto.Username)
                 {
-                    EnemiesKilled = r.EnemiesKilled,
-                    DamageDealt   = r.DamageDealt,
-                    Points        = r.Points
+                    EnemiesKilled = dto.EnemiesKilled,
+                    DamageDealt   = dto.DamageDealt,
+                    Points        = dto.Points
                 };
-                return (IUser)u;
+                return (IUser)user;
             }).ToList();
         }
 
-        // ── Private DTO (serialization only) ─────────────────────────────────
+        // ── DTO (serialization only) ──────────────────────────────────────────
 
-        private record UserRecord(
-            string Username,
-            int    EnemiesKilled,
-            double DamageDealt,
-            double Points);
+        private class UserDTO
+        {
+            public string Username      { get; set; } = string.Empty;
+            public int    EnemiesKilled { get; set; }
+            public double DamageDealt   { get; set; }
+            public double Points        { get; set; }
+        }
     }
 }

@@ -1,6 +1,5 @@
 // File: Forms/GameForm.cs
 using Shooter_Game0._1.Core;
-using Shooter_Game0._1.Data;
 using Shooter_Game0._1.Models.Enemies.Contracts;
 using Shooter_Game0._1.Models.Map.Contracts;
 using Shooter_Game0._1.Models.Users.Contracts;
@@ -8,6 +7,7 @@ using Shooter_Game0._1.Utilities;
 using Shooter_Game0._1.Utilities.Randomizer;
 using Shooter_Game0._1.Models.SaveData;
 using Shooter_Game0._1.Models.Maps;
+using Shooter_Game0._1.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -23,6 +23,9 @@ namespace Shooter_Game0._1.Forms
         private readonly Controller controller;
         private readonly IMap map;
         private readonly Difficulty difficulty;   // Phase 1
+
+        private readonly UsersRepository _usersRepository;
+        private readonly IUser _currentUser;
 
         private int cursorRow;
         private int cursorCol;
@@ -60,8 +63,11 @@ namespace Shooter_Game0._1.Forms
             LogMessage("Click a cell or WASD + Space to shoot.");
             LogMessage("Press H for hint, R for stats, Ctrl+Z to undo.");
 
-            IUser user = controller.GetOrCreateUser(username);
-            user.StatsChanged += OnUserStatsChanged;
+            _currentUser = controller.GetOrCreateUser(username);
+            _currentUser.StatsChanged += OnUserStatsChanged;
+
+            _usersRepository = new UsersRepository();
+            _usersRepository.UpdateModel(_currentUser);
 
             UpdateEnemiesLeft();
         }
@@ -91,9 +97,12 @@ namespace Shooter_Game0._1.Forms
             foreach (var move in state.MoveHistory)
                 moveHistory.Push((move.Row, move.Col));
 
-            IUser user = controller.GetOrCreateUser(username);
-            user.StatsChanged += OnUserStatsChanged;
-            user.Points = user.Points;   // triggers stats-changed to refresh UI
+            _currentUser = controller.GetOrCreateUser(username);
+            _currentUser.StatsChanged += OnUserStatsChanged;
+            _currentUser.Points = _currentUser.Points;   // triggers stats-changed to refresh UI
+
+            _usersRepository = new UsersRepository();
+            _usersRepository.UpdateModel(_currentUser);
 
             UpdateEnemiesLeft();
         }
@@ -323,8 +332,7 @@ namespace Shooter_Game0._1.Forms
         /// <summary>Penalty when the player loses a mini-game: deduct 150 points.</summary>
         private void ApplySpecialMovePenalty()
         {
-            IUser user = controller.GetOrCreateUser(username);
-            user.Points = Math.Max(0, user.Points - 150);
+            _currentUser.Points = Math.Max(0, _currentUser.Points - 150);
         }
 
         private void ShowHint()
@@ -347,17 +355,7 @@ namespace Shooter_Game0._1.Forms
             controller.StatsUpdate(username);
             string report = controller.GetReport();
 
-            try
-            {
-                using var context = new ShooterGameContext();
-                context.Database.EnsureCreated();
-                double score = controller.GetPlayerPoints(username);
-                context.SaveScore(username, score);
-            }
-            catch (Exception ex)
-            {
-                LogMessage($"[DB] Could not save score: {ex.Message}");
-            }
+            _usersRepository.UpdateModel(_currentUser);
 
             MessageBox.Show(report, "Game Over — Final Report",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);

@@ -26,5 +26,6 @@ namespace Shooter_Game0._1.Repositories
         public bool RemoveByName(string typeName)
             => enemies.Remove(enemies.FirstOrDefault(e => e.GetType().Name == typeName));
 
+        public void UpdateModel(IEnemy model) { }
     }
 }

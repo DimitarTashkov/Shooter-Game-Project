@@ -25,5 +25,6 @@ namespace Shooter_Game0._1.Repositories
 
         public bool RemoveByName(string typeName) => maps.Remove(maps.FirstOrDefault(m => m.GetType().Name == typeName));
 
+        public void UpdateModel(IMap model) { }
     }
 }

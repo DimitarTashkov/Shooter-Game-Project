@@ -13,5 +13,7 @@ namespace Shooter_Game0._1.Repositories.Contracts
         void AddNew(T name);
 
         bool RemoveByName(string typeName);
+
+        void UpdateModel(T model);
     }
 }

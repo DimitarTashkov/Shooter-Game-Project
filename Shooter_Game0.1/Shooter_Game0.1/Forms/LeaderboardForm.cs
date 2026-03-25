@@ -22,10 +22,9 @@ namespace Shooter_Game0._1.Forms
                 .Take(10)
                 .Select((u, i) => new
                 {
-                    Rank          = i + 1,
+                    Rank     = i + 1,
                     u.Username,
-                    Score         = u.Points,
-                    EnemiesKilled = u.EnemiesKilled
+                    Score    = u.Points
                 })
                 .ToList();
 

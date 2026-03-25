@@ -24,7 +24,8 @@ namespace Shooter_Game0._1.Repositories
 
 
         public bool RemoveByName(string typeName)
-            => weapons.Remove(weapons.FirstOrDefault( w=> w.GetType().Name == typeName));
+            => weapons.Remove(weapons.FirstOrDefault(w => w.GetType().Name == typeName));
 
+        public void UpdateModel(IWeapon model) { }
     }
 }

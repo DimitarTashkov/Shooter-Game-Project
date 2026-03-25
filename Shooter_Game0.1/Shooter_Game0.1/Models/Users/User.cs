@@ -22,6 +22,10 @@ namespace Shooter_Game0._1.Models.Users
         {
             this.username = username;
         }
+        public User()
+        {
+            this.username = "Unknown"; 
+        }
 
         public string Username
         {

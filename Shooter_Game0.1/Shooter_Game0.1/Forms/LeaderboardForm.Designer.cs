@@ -28,7 +28,6 @@ namespace Shooter_Game0._1.Forms
             Rank = new DataGridViewTextBoxColumn();
             Username = new DataGridViewTextBoxColumn();
             Score = new DataGridViewTextBoxColumn();
-            Date = new DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)scoresGrid).BeginInit();
             SuspendLayout();
             // 
@@ -48,34 +47,34 @@ namespace Shooter_Game0._1.Forms
             scoresGrid.AllowUserToAddRows = false;
             scoresGrid.AllowUserToDeleteRows = false;
             scoresGrid.AllowUserToResizeRows = false;
+            dataGridViewCellStyle1.BackColor = Color.FromArgb(42, 42, 55);
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 9.5F);
+            dataGridViewCellStyle1.ForeColor = Color.White;
+            dataGridViewCellStyle1.SelectionBackColor = Color.FromArgb(0, 100, 180);
+            dataGridViewCellStyle1.SelectionForeColor = Color.White;
+            scoresGrid.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             scoresGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             scoresGrid.BackgroundColor = Color.FromArgb(35, 35, 45);
             scoresGrid.BorderStyle = BorderStyle.None;
             scoresGrid.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             scoresGrid.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle1.BackColor = Color.FromArgb(50, 50, 65);
-            dataGridViewCellStyle1.ForeColor = Color.Gold;
-            dataGridViewCellStyle1.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            dataGridViewCellStyle1.SelectionBackColor = Color.FromArgb(50, 50, 65);
-            dataGridViewCellStyle1.SelectionForeColor = Color.Gold;
-            scoresGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle2.BackColor = Color.FromArgb(50, 50, 65);
+            dataGridViewCellStyle2.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            dataGridViewCellStyle2.ForeColor = Color.Gold;
+            dataGridViewCellStyle2.SelectionBackColor = Color.FromArgb(50, 50, 65);
+            dataGridViewCellStyle2.SelectionForeColor = Color.Gold;
+            scoresGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             scoresGrid.ColumnHeadersHeight = 35;
-            scoresGrid.AutoGenerateColumns = false;
-            scoresGrid.Columns.AddRange(new DataGridViewColumn[] { Rank, Username, Score, Date });
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = Color.FromArgb(35, 35, 45);
-            dataGridViewCellStyle2.ForeColor = Color.White;
-            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9.5F);
-            dataGridViewCellStyle2.SelectionBackColor = Color.FromArgb(0, 100, 180);
-            dataGridViewCellStyle2.SelectionForeColor = Color.White;
-            scoresGrid.DefaultCellStyle = dataGridViewCellStyle2;
-            dataGridViewCellStyle3.BackColor = Color.FromArgb(42, 42, 55);
-            dataGridViewCellStyle3.ForeColor = Color.White;
+            scoresGrid.Columns.AddRange(new DataGridViewColumn[] { Rank, Username, Score });
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = Color.FromArgb(35, 35, 45);
             dataGridViewCellStyle3.Font = new Font("Segoe UI", 9.5F);
+            dataGridViewCellStyle3.ForeColor = Color.White;
             dataGridViewCellStyle3.SelectionBackColor = Color.FromArgb(0, 100, 180);
             dataGridViewCellStyle3.SelectionForeColor = Color.White;
-            scoresGrid.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.False;
+            scoresGrid.DefaultCellStyle = dataGridViewCellStyle3;
             scoresGrid.EnableHeadersVisualStyles = false;
             scoresGrid.GridColor = Color.FromArgb(55, 55, 70);
             scoresGrid.Location = new Point(23, 70);
@@ -110,38 +109,29 @@ namespace Shooter_Game0._1.Forms
             // Rank
             // 
             Rank.DataPropertyName = "Rank";
+            Rank.FillWeight = 15F;
             Rank.HeaderText = "Rank";
-            Rank.FillWeight = 15;
             Rank.MinimumWidth = 40;
             Rank.Name = "Rank";
             Rank.ReadOnly = true;
-            // 
+            //
             // Username
-            // 
+            //
             Username.DataPropertyName = "Username";
+            Username.FillWeight = 55F;
             Username.HeaderText = "Username";
-            Username.FillWeight = 35;
             Username.MinimumWidth = 80;
             Username.Name = "Username";
             Username.ReadOnly = true;
-            // 
+            //
             // Score
-            // 
+            //
             Score.DataPropertyName = "Score";
+            Score.FillWeight = 30F;
             Score.HeaderText = "Score";
-            Score.FillWeight = 20;
             Score.MinimumWidth = 60;
             Score.Name = "Score";
             Score.ReadOnly = true;
-            // 
-            // Date
-            // 
-            Date.DataPropertyName = "Date";
-            Date.HeaderText = "Date";
-            Date.FillWeight = 30;
-            Date.MinimumWidth = 80;
-            Date.Name = "Date";
-            Date.ReadOnly = true;
             // 
             // LeaderboardForm
             // 
@@ -161,12 +151,10 @@ namespace Shooter_Game0._1.Forms
             Text = "Leaderboard";
             ((System.ComponentModel.ISupportInitialize)scoresGrid).EndInit();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         private DataGridViewTextBoxColumn Rank;
         private DataGridViewTextBoxColumn Username;
         private DataGridViewTextBoxColumn Score;
-        private DataGridViewTextBoxColumn Date;
     }
 }
