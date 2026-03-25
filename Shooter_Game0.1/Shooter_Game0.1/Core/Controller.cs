@@ -1,4 +1,5 @@
-﻿using Shooter_Game0._1.Core.Contracts;
+// File: Core/Controller.cs
+using Shooter_Game0._1.Core.Contracts;
 using Shooter_Game0._1.Factories;
 using Shooter_Game0._1.IO;
 using Shooter_Game0._1.Models.Enemies.Contracts;
@@ -6,11 +7,15 @@ using Shooter_Game0._1.Models.Map.Contracts;
 using Shooter_Game0._1.Models.Users.Contracts;
 using Shooter_Game0._1.Models.Weapons.Contracts;
 using Shooter_Game0._1.Repositories;
+using Shooter_Game0._1.Utilities;
 using Shooter_Game0._1.Utilities.Hinter;
 using Shooter_Game0._1.Utilities.Messages;
 using Shooter_Game0._1.Utilities.Randomizer;
 using Shooter_Game0._1.Core.Commands;
 using Shooter_Game0._1.Models.SaveData;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Shooter_Game0._1.Core
@@ -37,20 +42,22 @@ namespace Shooter_Game0._1.Core
 
         public Controller()
         {
-            this.enemyFactory = new EnemyFactory();
-            this.enemies = new EnemiesRepository();
-            this.weapons = new WeaponsRepository();
-            this.maps = new MapsRepository();
-            this.users = new UsersRepository();
-            this.builder = new DataBuilder();
-            this.sb = new StringBuilder();
-            this.writer = new Writer();
-            enemiesCoordinates = new EnemiesCoordinatesRepository();
-            commandManager = new CommandManager();
+            this.enemyFactory        = new EnemyFactory();
+            this.enemies             = new EnemiesRepository();
+            this.weapons             = new WeaponsRepository();
+            this.maps                = new MapsRepository();
+            this.users               = new UsersRepository();
+            this.builder             = new DataBuilder();
+            this.sb                  = new StringBuilder();
+            this.writer              = new Writer();
+            this.enemiesCoordinates  = new EnemiesCoordinatesRepository();
+            this.commandManager      = new CommandManager();
         }
+
         public Dictionary<Dictionary<int, int>, IEnemy> EnemiesCoordinates => enemiesCoordinates.Enemiescoordinates;
-        public int EnemiesCoordinatesCount => enemiesCoordinates.Enemiescoordinates.Count; // Helper if needed
+        public int EnemiesCoordinatesCount => enemiesCoordinates.Enemiescoordinates.Count;
         public IMap? CurrentMap => maps.Models().FirstOrDefault();
+
         public void SetWeaponType(string weaponType) => selectedWeaponType = weaponType;
         public string GetReport() => sb.ToString().Trim();
 
@@ -71,31 +78,34 @@ namespace Shooter_Game0._1.Core
             return user;
         }
 
-        public SessionState GetSessionState(string username)
+        // ── Session persistence ───────────────────────────────────────────────
+
+        public SessionState GetSessionState(string username, Difficulty difficulty)
         {
             IUser user = GetOrCreateUser(username);
-            IMap? map = CurrentMap;
+            IMap? map  = CurrentMap;
 
             var state = new SessionState
             {
-                Username = username,
-                WeaponType = selectedWeaponType ?? "Pistol",
+                Username    = username,
+                WeaponType  = selectedWeaponType ?? "Rifle",
+                Difficulty  = difficulty,
                 DamageDealt = user.DamageDealt,
                 EnemiesKilled = user.EnemiesKilled,
-                Points = user.Points,
-                MapType = map?.GetType().Name ?? "DefaultMap",
-                MapX = map?.X ?? 5,
-                MapY = map?.Y ?? 5
+                Points      = user.Points,
+                MapType     = map?.GetType().Name ?? "DefaultMap",
+                MapX        = map?.X ?? 5,
+                MapY        = map?.Y ?? 5
             };
 
             state.Enemies = enemiesCoordinates.Enemiescoordinates.Select(kvp => new EnemyState
             {
-                EnemyType = kvp.Value.GetType().Name,
-                Life = kvp.Value.Life,
+                EnemyType        = kvp.Value.GetType().Name,
+                Life             = kvp.Value.Life,
                 IsAlreadyGenerated = kvp.Value.IsAlreadyGenerated,
-                IsEnemyKilled = kvp.Value.IsEnemyKilled,
-                Row = kvp.Key.Keys.First(),
-                Col = kvp.Key.Values.First()
+                IsEnemyKilled    = kvp.Value.IsEnemyKilled,
+                Row              = kvp.Key.Keys.First(),
+                Col              = kvp.Key.Values.First()
             }).ToList();
 
             return state;
@@ -103,25 +113,23 @@ namespace Shooter_Game0._1.Core
 
         public void LoadSessionState(SessionState state, IMap map)
         {
-            // Reset existing collections manually or rebuild them
-            // In typical scenario, Controller is fresh when calling this
             maps.AddNew(map);
             selectedWeaponType = state.WeaponType;
 
             IUser user = builder.CreateUser(state.Username);
-            user.DamageDealt = state.DamageDealt;
+            user.DamageDealt   = state.DamageDealt;
             user.EnemiesKilled = state.EnemiesKilled;
-            user.Points = state.Points;
+            user.Points        = state.Points;
             users.AddNew(user);
 
             foreach (var es in state.Enemies)
             {
                 IEnemy enemy = enemyFactory.CreateEnemy(es.EnemyType);
-                enemy.Life = es.Life;
+                enemy.Life             = es.Life;
                 enemy.IsAlreadyGenerated = es.IsAlreadyGenerated;
-                enemy.IsEnemyKilled = es.IsEnemyKilled;
+                enemy.IsEnemyKilled    = es.IsEnemyKilled;
 
-                Dictionary<int, int> coords = new Dictionary<int, int> { { es.Row, es.Col } };
+                var coords = new Dictionary<int, int> { { es.Row, es.Col } };
                 enemies.AddNew(enemy);
                 enemiesCoordinates.AddEnemy(coords, enemy);
             }
@@ -135,18 +143,14 @@ namespace Shooter_Game0._1.Core
             if (commandManager.HasHistory)
             {
                 commandManager.UndoPreviousCommand();
-                
                 IMap? map = maps.Models().FirstOrDefault();
-                if (map != null)
-                {
-                    // Redraw map with restored enemy positions
-                    map.VisualizeMap(map.Terrain);
-                }
-                
+                map?.VisualizeMap(map.Terrain);
                 return "Action undone.";
             }
             return "No more actions to undo.";
-        }     
+        }
+
+        // ── Enemy generation ──────────────────────────────────────────────────
 
         public string GenerateEnemies(IMap map, int countOfEnemies)
         {
@@ -155,17 +159,13 @@ namespace Shooter_Game0._1.Core
             {
                 IEnemy generatedEnemy = enemyFactory.CreateRandomEnemy();
                 enemies.AddNew(generatedEnemy);
-                Dictionary<int, int> enemyCoordinates = Randomizer.EnemiesGenerationRandomizer(map);
-                while (map.CoordinateIsAlreadyInhabitated(enemyCoordinates, enemiesCoordinates.Enemiescoordinates)) 
-                {
-                    enemyCoordinates = Randomizer.EnemiesGenerationRandomizer(map);
-                }
 
-                if(!map.CoordinateIsAlreadyInhabitated(enemyCoordinates, enemiesCoordinates.Enemiescoordinates))
-                {                                                             
-                    enemiesCoordinates.AddEnemy(enemyCoordinates, generatedEnemy);
-                }                
-               
+                Dictionary<int, int> enemyCoords = Randomizer.EnemiesGenerationRandomizer(map);
+                while (map.CoordinateIsAlreadyInhabitated(enemyCoords, enemiesCoordinates.Enemiescoordinates))
+                    enemyCoords = Randomizer.EnemiesGenerationRandomizer(map);
+
+                if (!map.CoordinateIsAlreadyInhabitated(enemyCoords, enemiesCoordinates.Enemiescoordinates))
+                    enemiesCoordinates.AddEnemy(enemyCoords, generatedEnemy);
             }
             maps.AddNew(map);
             map.VisualizeMap(map.Terrain);
@@ -175,20 +175,21 @@ namespace Shooter_Game0._1.Core
             return sb.ToString().Trim();
         }
 
-        public string Shoot(int xCoordinate, int yCoordinate, string username)
+        // ── Shoot ─────────────────────────────────────────────────────────────
+
+        /// <summary>Primary overload — includes difficulty for rebirth & special-move logic.</summary>
+        public string Shoot(int xCoordinate, int yCoordinate, string username, Difficulty difficulty)
         {
             sb.Clear();
 
             IMap? map = maps.Models().FirstOrDefault();
             if (map == null)
-            {
                 throw new InvalidOperationException(ExceptionMessages.MapHasNotBeenAdded);
-            }
 
             IWeapon weapon = selectedWeaponType != null
                 ? builder.CreateWeapon(selectedWeaponType)
                 : Randomizer.WeaponsRandomizer();
-            
+
             IEnemy? enemy = ReturnEnemyFromCoordinates(xCoordinate, yCoordinate, enemiesCoordinates.Enemiescoordinates);
             weapons.AddNew(weapon);
             IUser user = GetOrCreateUser(username);
@@ -197,21 +198,25 @@ namespace Shooter_Game0._1.Core
             oldXCoordinate = xCoordinate;
             oldYCoordinate = yCoordinate;
             map.Terrain[xCoordinate, yCoordinate] = "+";
-            
+
             var shootCommand = new ShootCommand(
-                enemy, weapon, user, map, enemiesCoordinates, xCoordinate, yCoordinate);
-            
+                enemy, weapon, user, map, enemiesCoordinates,
+                xCoordinate, yCoordinate, difficulty);
+
             commandManager.ExecuteCommand(shootCommand);
 
             map.VisualizeMap(map.Terrain);
             return shootCommand.ResultMessage;
         }
 
-        // Keep the old signature for compatibility, if called elsewhere without username
+        /// <summary>Backward-compatible overloads.</summary>
+        public string Shoot(int xCoordinate, int yCoordinate, string username)
+            => Shoot(xCoordinate, yCoordinate, username, Difficulty.Easy);
+
         public string Shoot(int xCoordinate, int yCoordinate)
-        {
-            return Shoot(xCoordinate, yCoordinate, "Default");
-        }
+            => Shoot(xCoordinate, yCoordinate, "Default", Difficulty.Easy);
+
+        // ── Stats ─────────────────────────────────────────────────────────────
 
         public void StatsUpdate(string username)
         {
@@ -222,26 +227,31 @@ namespace Shooter_Game0._1.Core
                 user = builder.CreateUser(username);
                 users.AddNew(user);
             }
-            user.DamageDealt += collectDealtDamage;
+            user.DamageDealt   += collectDealtDamage;
             user.EnemiesKilled += collectKills;
             user.Points = (user.EnemiesKilled * 300) + (user.DamageDealt / 3);
-            sb.AppendLine(string.Format(OutputMessages.UserReport, username, user.DamageDealt, user.EnemiesKilled, Math.Round(user.Points,2)));
-        }
-        public void Report()
-        {
-            writer.WriteLine(sb.ToString().Trim());
-        }
-        private IEnemy? ReturnEnemyFromCoordinates(int x, int y, Dictionary<Dictionary<int, int>, IEnemy> enemiesCoordinates)
-        {
-            return enemiesCoordinates.FirstOrDefault(kvp => kvp.Key.ContainsKey(x) && kvp.Key[x] == y).Value;
+            sb.AppendLine(string.Format(OutputMessages.UserReport,
+                username, user.DamageDealt, user.EnemiesKilled, Math.Round(user.Points, 2)));
         }
 
-        public string Hint(int xCoordinate, int yCoordinate, string[,] terrain, Dictionary<Dictionary<int, int>, IEnemy> enemiesCoordinates)
+        public void Report() => writer.WriteLine(sb.ToString().Trim());
+
+        // ── Hint ──────────────────────────────────────────────────────────────
+
+        public string Hint(int xCoordinate, int yCoordinate, string[,] terrain,
+            Dictionary<Dictionary<int, int>, IEnemy> enemiesCoords)
         {
             sb.Clear();
-            string closestEnemy = Hinter.GetHint(xCoordinate, yCoordinate, terrain, enemiesCoordinates);
-            sb.AppendLine(closestEnemy);
+            sb.AppendLine(Hinter.GetHint(xCoordinate, yCoordinate, terrain, enemiesCoords));
             return sb.ToString().Trim();
+        }
+
+        // ── Private helpers ───────────────────────────────────────────────────
+
+        private IEnemy? ReturnEnemyFromCoordinates(int x, int y,
+            Dictionary<Dictionary<int, int>, IEnemy> coords)
+        {
+            return coords.FirstOrDefault(kvp => kvp.Key.ContainsKey(x) && kvp.Key[x] == y).Value;
         }
     }
 }

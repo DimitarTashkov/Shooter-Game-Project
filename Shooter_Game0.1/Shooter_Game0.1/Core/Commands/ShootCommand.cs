@@ -1,10 +1,14 @@
+// File: Core/Commands/ShootCommand.cs
 using Shooter_Game0._1.Core.Contracts;
 using Shooter_Game0._1.Models.Enemies.Contracts;
 using Shooter_Game0._1.Models.Map.Contracts;
 using Shooter_Game0._1.Models.Users.Contracts;
 using Shooter_Game0._1.Models.Weapons.Contracts;
 using Shooter_Game0._1.Repositories;
+using Shooter_Game0._1.Utilities;
 using Shooter_Game0._1.Utilities.Messages;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Shooter_Game0._1.Core.Commands
 {
@@ -15,11 +19,12 @@ namespace Shooter_Game0._1.Core.Commands
         private IUser user;
         private IMap map;
         private EnemiesCoordinatesRepository enemiesCoordinates;
+        private readonly Difficulty difficulty;
 
         private int xCoordinate;
         private int yCoordinate;
 
-        // State variables for undo
+        // State snapshots for undo
         private double previousEnemyLife;
         private bool previousEnemyGenerated;
         private bool previousEnemyKilled;
@@ -27,10 +32,19 @@ namespace Shooter_Game0._1.Core.Commands
 
         private double previousUserDamage;
         private int previousUserKills;
+        private double previousUserPoints;
 
         public string ResultMessage { get; private set; } = string.Empty;
 
-        public ShootCommand(IEnemy? enemy, IWeapon weapon, IUser user, IMap map, EnemiesCoordinatesRepository enemiesCoordinates, int xCoordinate, int yCoordinate)
+        public ShootCommand(
+            IEnemy? enemy,
+            IWeapon weapon,
+            IUser user,
+            IMap map,
+            EnemiesCoordinatesRepository enemiesCoordinates,
+            int xCoordinate,
+            int yCoordinate,
+            Difficulty difficulty)
         {
             this.enemy = enemy;
             this.weapon = weapon;
@@ -39,13 +53,15 @@ namespace Shooter_Game0._1.Core.Commands
             this.enemiesCoordinates = enemiesCoordinates;
             this.xCoordinate = xCoordinate;
             this.yCoordinate = yCoordinate;
+            this.difficulty = difficulty;
         }
 
         public void Execute()
         {
-            // Save user state
+            // Snapshot user state for undo
             previousUserDamage = user.DamageDealt;
-            previousUserKills = user.EnemiesKilled;
+            previousUserKills  = user.EnemiesKilled;
+            previousUserPoints = user.Points;
 
             if (enemy == null)
             {
@@ -53,40 +69,54 @@ namespace Shooter_Game0._1.Core.Commands
                 return;
             }
 
-            // Save enemy state
-            previousEnemyLife = enemy.Life;
+            // Snapshot enemy state for undo
+            previousEnemyLife      = enemy.Life;
             previousEnemyGenerated = enemy.IsAlreadyGenerated;
-            previousEnemyKilled = enemy.IsEnemyKilled;
-
-            // Reconstruct current coordinates for backup
+            previousEnemyKilled    = enemy.IsEnemyKilled;
             previousEnemyCoordinates = new Dictionary<int, int> { { xCoordinate, yCoordinate } };
 
-            Dictionary<int, int> aimCoordinates = new Dictionary<int, int> { { xCoordinate, yCoordinate } };
+            var aimCoordinates = new Dictionary<int, int> { { xCoordinate, yCoordinate } };
 
             weapon.CalculateDamage();
-            double remain = weapon.Damage - enemy.Life;
+            double remainingLife = enemy.Life - weapon.Damage;
 
-            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            var sb = new System.Text.StringBuilder();
 
-            if (remain <= 0)
+            if (remainingLife > 0)
             {
+                // ── Enemy survives the hit ────────────────────────────────────
                 user.DamageDealt += weapon.Damage;
-                enemy.Life -= weapon.Damage;
-                sb.AppendLine(string.Format(OutputMessages.EnemyWasShotFor, enemy.GetType().Name, weapon.Damage, weapon.GetType().Name, xCoordinate, yCoordinate));
+                enemy.Life       -= weapon.Damage;
+                sb.AppendLine(string.Format(OutputMessages.EnemyWasShotFor,
+                    enemy.GetType().Name, weapon.Damage, weapon.GetType().Name, xCoordinate, yCoordinate));
                 sb.AppendLine(enemy.RegenHealth());
 
                 enemiesCoordinates.RemoveEnemy(aimCoordinates);
-                enemy.RunCoordinates(map, enemy, enemiesCoordinates.Enemiescoordinates);                   
+                enemy.RunCoordinates(map, enemy, enemiesCoordinates.Enemiescoordinates);
             }
             else
             {
-                user.DamageDealt += weapon.Damage; // Assuming we add full damage, or maybe life
-                enemiesCoordinates.RemoveEnemy(aimCoordinates);
+                // ── Enemy would die — check for rebirth (Phase 4) ─────────────
+                user.DamageDealt += weapon.Damage;
 
-                user.EnemiesKilled++;
-                enemy.IsEnemyKilled = true;
-
-                sb.AppendLine(string.Format(OutputMessages.EnemyWasKilled, enemy.GetType().Name, weapon.GetType().Name, xCoordinate, yCoordinate, enemiesCoordinates.Enemiescoordinates.Count));
+                bool reborn = enemy.TryRebirth(difficulty);
+                if (reborn)
+                {
+                    // Enemy survived through rebirth — reposition on the map
+                    sb.AppendLine($"☠ {enemy.GetType().Name} was nearly killed but REBORN with {System.Math.Round(enemy.Life)} HP!");
+                    enemiesCoordinates.RemoveEnemy(aimCoordinates);
+                    enemy.RunCoordinates(map, enemy, enemiesCoordinates.Enemiescoordinates);
+                }
+                else
+                {
+                    // Normal kill
+                    enemiesCoordinates.RemoveEnemy(aimCoordinates);
+                    user.EnemiesKilled++;
+                    enemy.IsEnemyKilled = true;
+                    sb.AppendLine(string.Format(OutputMessages.EnemyWasKilled,
+                        enemy.GetType().Name, weapon.GetType().Name, xCoordinate, yCoordinate,
+                        enemiesCoordinates.Enemiescoordinates.Count));
+                }
             }
 
             // Recalculate points
@@ -96,41 +126,27 @@ namespace Shooter_Game0._1.Core.Commands
 
         public void Undo()
         {
-            // Revert User state
-            user.DamageDealt = previousUserDamage;
+            // Restore user state
+            user.DamageDealt   = previousUserDamage;
             user.EnemiesKilled = previousUserKills;
-            user.Points = (user.EnemiesKilled * 300) + (user.DamageDealt / 3);
+            user.Points        = previousUserPoints;
 
             if (enemy == null || previousEnemyCoordinates == null) return;
 
-            // Revert Enemy state
-            enemy.Life = previousEnemyLife;
+            // Restore enemy state
+            enemy.Life             = previousEnemyLife;
             enemy.IsAlreadyGenerated = previousEnemyGenerated;
-            enemy.IsEnemyKilled = previousEnemyKilled;
+            enemy.IsEnemyKilled    = previousEnemyKilled;
 
-            // Find where enemy is now, and remove it from there (if it wasn't killed)
-            // If it was killed, it's not in the dictionary.
+            // Find enemy's current position (might have moved or been removed)
+            Dictionary<int, int>? currentCoords = enemiesCoordinates.Enemiescoordinates
+                .FirstOrDefault(kvp => kvp.Value == enemy).Key;
 
-            // To properly remove current coordinates, we need to find it:
-            Dictionary<int, int>? currentEnemyCoords = null;
-            foreach (var kvp in enemiesCoordinates.Enemiescoordinates)
-            {
-                if (kvp.Value == enemy)
-                {
-                    currentEnemyCoords = kvp.Key;
-                    break;
-                }
-            }
+            if (currentCoords != null)
+                enemiesCoordinates.RemoveEnemy(currentCoords);
 
-            if (currentEnemyCoords != null)
-            {
-                enemiesCoordinates.RemoveEnemy(currentEnemyCoords);
-            }
-
-            // Put it back to old coordinates
+            // Restore enemy to original coordinates
             enemiesCoordinates.AddEnemy(previousEnemyCoordinates, enemy);
-
-            // Revert the terrain cell if needed, though MapPanel renders from coords anyway.
         }
     }
 }

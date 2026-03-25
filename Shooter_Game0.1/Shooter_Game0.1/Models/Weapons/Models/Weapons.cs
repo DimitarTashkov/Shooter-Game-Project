@@ -1,10 +1,9 @@
-﻿using Shooter_Game0._1.Models.Weapons.Contracts;
+// File: Models/Weapons/Models/Weapons.cs
+using Shooter_Game0._1.Models.Weapons.Contracts;
 using Shooter_Game0._1.Utilities.Messages;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Shooter_Game0._1.Models.Weapons.Models
 {
@@ -20,17 +19,14 @@ namespace Shooter_Game0._1.Models.Weapons.Models
             this.power = power;
         }
 
-        //Validation is optinal as our weapons have greater stats than the validation.
-        //NOTE: if you change the stats to invalid one you will need it tho
+        // Validation is optional — weapon stats are always valid by construction.
         public double AmmoType
         {
             get { return ammoType; }
             set
             {
-                if (value <= 0 )
-                {
+                if (value <= 0)
                     throw new ArgumentException(string.Format(ExceptionMessages.InvalidWeaponsStats));
-                }
                 ammoType = value;
             }
         }
@@ -41,9 +37,7 @@ namespace Shooter_Game0._1.Models.Weapons.Models
             set
             {
                 if (value <= 0)
-                {
                     throw new ArgumentException(string.Format(ExceptionMessages.InvalidWeaponsStats));
-                }
                 power = value;
             }
         }
@@ -54,33 +48,36 @@ namespace Shooter_Game0._1.Models.Weapons.Models
             set
             {
                 if (value <= 0)
-                {
                     throw new ArgumentException(string.Format(ExceptionMessages.InvalidWeaponsStats));
-                }
                 damage = value;
             }
         }
+
         public void CalculateDamage()
         {
             damage = ammoType * power;
-            if(IsHeadShot())
-            {
+            if (IsHeadShot())
                 HeadShotDamage();
-            }
         }
-        private  void HeadShotDamage()
-        {
-            damage = damage * 2;
-        }
+
+        private void HeadShotDamage() => damage *= 2;
+
         public abstract bool IsHeadShot();
+
+        // ── Phase 5: Polymorphic special action ───────────────────────────────
+        /// <summary>
+        /// Each weapon's unique mechanic. Returns false to block the current shot.
+        /// </summary>
+        public abstract bool SpecialAction(Form gameForm);
+
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.AppendLine($"Weapon name: {this.GetType().Name}");
             sb.AppendLine($"Weapon ammo type: {AmmoType}");
             sb.AppendLine($"Weapon power: {Power}");
             sb.AppendLine($"Weapon damage: {Damage}");
-            sb.AppendLine($"Weapon dealth headshot: {IsHeadShot()}");
+            sb.AppendLine($"Weapon dealt headshot: {IsHeadShot()}");
             return sb.ToString().Trim();
         }
     }
