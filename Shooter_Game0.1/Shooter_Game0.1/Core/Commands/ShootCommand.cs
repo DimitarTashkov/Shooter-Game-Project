@@ -95,7 +95,7 @@ namespace Shooter_Game0._1.Core.Commands
             }
             else
             {
-=                user.DamageDealt += weapon.Damage;
+                user.DamageDealt += weapon.Damage;
 
                 bool reborn = enemy.TryRebirth(difficulty);
                 if (reborn)
