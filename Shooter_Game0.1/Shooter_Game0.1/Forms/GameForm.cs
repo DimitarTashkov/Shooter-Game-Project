@@ -1,4 +1,3 @@
-// File: Forms/GameForm.cs
 using Shooter_Game0._1.Core;
 using Shooter_Game0._1.Models.Enemies.Contracts;
 using Shooter_Game0._1.Models.Map.Contracts;
@@ -22,7 +21,7 @@ namespace Shooter_Game0._1.Forms
         private readonly string weaponType;
         private readonly Controller controller;
         private readonly IMap map;
-        private readonly Difficulty difficulty;   // Phase 1
+        private readonly Difficulty difficulty; 
 
         private readonly UsersRepository _usersRepository;
         private readonly IUser _currentUser;
@@ -36,8 +35,6 @@ namespace Shooter_Game0._1.Forms
 
         private int CellWidth  => mapPanel.Width  / Math.Max(map.Y, 1);
         private int CellHeight => mapPanel.Height / Math.Max(map.X, 1);
-
-        // ── Constructors ──────────────────────────────────────────────────────
 
         public GameForm(string username, string weaponType, Difficulty difficulty)
         {
@@ -273,11 +270,7 @@ namespace Shooter_Game0._1.Forms
 
         // ── Game logic ────────────────────────────────────────────────────────
 
-        /// <summary>
-        /// Core shoot method integrating:
-        /// - Phase 2: enemy SpecialMove (30% mini-game trigger on hit)
-        /// - Phase 4: TryRebirth (handled inside ShootCommand)
-        ///</summary>
+
         private void ShootAt(int row, int col)
         {
             if (controller.EnemiesCoordinates.Count == 0)
@@ -286,7 +279,7 @@ namespace Shooter_Game0._1.Forms
                 return;
             }
 
-            // ── Phase 2: Check if enemy is at this cell → maybe trigger mini-game ──
+            // Check if enemy is at this cell → maybe trigger mini-game ──
             IEnemy? enemy = GetEnemyAt(row, col);
             if (enemy != null && ShouldTriggerSpecialMove())
             {
@@ -307,7 +300,6 @@ namespace Shooter_Game0._1.Forms
                 }
             }
 
-            // ── Normal shot ───────────────────────────────────────────────────
             moveHistory.Push((row, col));
 
             string result = controller.Shoot(row, col, username, difficulty);
@@ -318,7 +310,6 @@ namespace Shooter_Game0._1.Forms
                 LogMessage("*** ALL ENEMIES ELIMINATED! ***");
         }
 
-        /// <summary>Returns enemy at (row, col) or null if cell is empty.</summary>
         private IEnemy? GetEnemyAt(int row, int col)
         {
             return controller.EnemiesCoordinates
@@ -326,10 +317,8 @@ namespace Shooter_Game0._1.Forms
                 .Value;
         }
 
-        /// <summary>30% chance to trigger a mini-game on a successful hit.</summary>
         private bool ShouldTriggerSpecialMove() => _rng.Next(1, 11) <= 3;
 
-        /// <summary>Penalty when the player loses a mini-game: deduct 150 points.</summary>
         private void ApplySpecialMovePenalty()
         {
             _currentUser.Points = Math.Max(0, _currentUser.Points - 150);

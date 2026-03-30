@@ -1,4 +1,3 @@
-// File: Forms/LeaderboardForm.cs
 using Shooter_Game0._1.Repositories;
 using System.Linq;
 using System.Windows.Forms;

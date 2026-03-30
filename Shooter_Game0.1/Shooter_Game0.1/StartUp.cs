@@ -1,4 +1,3 @@
-// File: StartUp.cs
 using Shooter_Game0._1.Forms;
 
 namespace Shooter_Game0._1

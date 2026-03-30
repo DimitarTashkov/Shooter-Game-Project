@@ -1,4 +1,3 @@
-// File: Forms/MiniGames/ShotgunJamForm.cs
 using System;
 using System.Drawing;
 using System.Windows.Forms;

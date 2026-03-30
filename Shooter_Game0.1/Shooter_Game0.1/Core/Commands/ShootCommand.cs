@@ -1,4 +1,3 @@
-// File: Core/Commands/ShootCommand.cs
 using Shooter_Game0._1.Core.Contracts;
 using Shooter_Game0._1.Models.Enemies.Contracts;
 using Shooter_Game0._1.Models.Map.Contracts;
@@ -96,8 +95,7 @@ namespace Shooter_Game0._1.Core.Commands
             }
             else
             {
-                // ── Enemy would die — check for rebirth (Phase 4) ─────────────
-                user.DamageDealt += weapon.Damage;
+=                user.DamageDealt += weapon.Damage;
 
                 bool reborn = enemy.TryRebirth(difficulty);
                 if (reborn)

@@ -1,4 +1,3 @@
-// File: Models/Enemies/Contracts/IEnemy.cs
 using Shooter_Game0._1.Models.Map.Contracts;
 using Shooter_Game0._1.Utilities;
 using System.Collections.Generic;

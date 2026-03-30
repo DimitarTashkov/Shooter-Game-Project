@@ -1,4 +1,3 @@
-// File: Repositories/UsersRepository.cs
 using Shooter_Game0._1.Models.Users;
 using Shooter_Game0._1.Models.Users.Contracts;
 using Shooter_Game0._1.Repositories.Contracts;
@@ -84,8 +83,6 @@ namespace Shooter_Game0._1.Repositories
                 return (IUser)user;
             }).ToList();
         }
-
-        // ── DTO (serialization only) ──────────────────────────────────────────
 
         private class UserDTO
         {

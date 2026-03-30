@@ -13,9 +13,7 @@ namespace Shooter_Game0._1.Models.Users.Contracts
         public double DamageDealt { get; set; }
         public double Points { get; set; }
 
-        /// <summary>
-        /// Observer Pattern: Fires when any stat changes so the UI can update automatically.
-        /// </summary>
+
         event EventHandler<UserStatsChangedEventArgs>? StatsChanged;
     }
 

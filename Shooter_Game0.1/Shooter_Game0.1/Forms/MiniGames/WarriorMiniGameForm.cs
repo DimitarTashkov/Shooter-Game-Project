@@ -1,4 +1,3 @@
-// File: Forms/MiniGames/WarriorMiniGameForm.cs
 using Shooter_Game0._1.Models.Weapons.Models;
 using Shooter_Game0._1.Utilities;
 using System;

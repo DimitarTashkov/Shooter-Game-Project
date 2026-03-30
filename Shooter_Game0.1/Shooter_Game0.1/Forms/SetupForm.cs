@@ -1,4 +1,3 @@
-// File: Forms/SetupForm.cs
 using Shooter_Game0._1.Utilities;
 
 namespace Shooter_Game0._1.Forms

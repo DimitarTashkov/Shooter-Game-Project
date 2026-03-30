@@ -3,11 +3,7 @@ using Shooter_Game0._1.Models.Enemies.Models;
 
 namespace Shooter_Game0._1.Factories
 {
-    /// <summary>
-    /// Factory Method Pattern: Encapsulates enemy creation logic.
-    /// Replaces scattered <c>new Orc()</c> / <c>new Tank()</c> calls
-    /// with a single factory method.
-    /// </summary>
+
     public class EnemyFactory
     {
         public IEnemy CreateEnemy(string type)

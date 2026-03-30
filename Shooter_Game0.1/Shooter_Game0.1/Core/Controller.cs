@@ -1,4 +1,3 @@
-// File: Core/Controller.cs
 using Shooter_Game0._1.Core.Contracts;
 using Shooter_Game0._1.Factories;
 using Shooter_Game0._1.IO;
@@ -177,7 +176,6 @@ namespace Shooter_Game0._1.Core
 
         // ── Shoot ─────────────────────────────────────────────────────────────
 
-        /// <summary>Primary overload — includes difficulty for rebirth & special-move logic.</summary>
         public string Shoot(int xCoordinate, int yCoordinate, string username, Difficulty difficulty)
         {
             sb.Clear();
@@ -209,7 +207,6 @@ namespace Shooter_Game0._1.Core
             return shootCommand.ResultMessage;
         }
 
-        /// <summary>Backward-compatible overloads.</summary>
         public string Shoot(int xCoordinate, int yCoordinate, string username)
             => Shoot(xCoordinate, yCoordinate, username, Difficulty.Easy);
 
